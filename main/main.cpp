@@ -87,9 +87,11 @@ extern "C"
 void app_main()
 {
   WZ8048C050_Init();
-  ui_init(disp);
+ //(disp);
+  ESP_LOGI(TAG, "UI Init");
+  ui_init();
 
-  xTaskCreate(&lvglTask, "lvglTask", 4096, NULL, 8, NULL);
+  xTaskCreate(&lvglTask, "lvglTask", 4096, NULL, 4, NULL);
 }
 
 

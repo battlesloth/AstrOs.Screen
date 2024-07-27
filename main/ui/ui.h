@@ -102,7 +102,7 @@ LV_IMG_DECLARE(ui_img_gear_png);    // assets/gear.png
 
 
 
-void ui_init(lv_disp_t * dispp);
+void ui_init(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

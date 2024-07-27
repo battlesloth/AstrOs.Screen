@@ -259,9 +259,9 @@ void ui_event_settingsscreen_kbdsettings(lv_event_t * e)
 
 ///////////////////// SCREENS ////////////////////
 
-void ui_init(lv_disp_t * dispp)
+void ui_init(void)
 {
-    //lv_disp_t * dispp = lv_disp_get_default();
+    lv_disp_t * dispp = lv_disp_get_default();
     lv_theme_t * theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
                                                true, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
