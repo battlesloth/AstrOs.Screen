@@ -10,6 +10,23 @@
 extern "C" {
 #endif
 
+void onScript1(lv_event_t * e);
+void onScript2(lv_event_t * e);
+void onScript3(lv_event_t * e);
+void onScript4(lv_event_t * e);
+void onScript5(lv_event_t * e);
+void onScript6(lv_event_t * e);
+void onScript7(lv_event_t * e);
+void onScript8(lv_event_t * e);
+void onScript9(lv_event_t * e);
+void onPanicStop(lv_event_t * e);
+void onBack(lv_event_t * e);
+void onForward(lv_event_t * e);
+void onWifiScan(lv_event_t * e);
+void onWifiConnect(lv_event_t * e);
+void onSyncScripts(lv_event_t * e);
+void onKbdPressed(lv_event_t * e);
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

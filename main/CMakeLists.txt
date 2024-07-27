@@ -1,6 +1,7 @@
+FILE(GLOB_RECURSE UI_Sources ${CMAKE_SOURCE_DIR} "ui/*.c")
+
 idf_component_register(SRCS 
     "main.cpp" 
-    "ui/ui.c"
-    "ui/ui_helpers.c"
-    "ui/screens/ui_Screen1.c"
-                    INCLUDE_DIRS ".")
+    ${UI_Sources}
+        INCLUDE_DIRS "." "ui")
+

@@ -25,19 +25,84 @@ extern "C" {
 #include "ui_helpers.h"
 #include "ui_events.h"
 
-// SCREEN: ui_Screen1
-void ui_Screen1_screen_init(void);
-extern lv_obj_t * ui_Screen1;
-extern lv_obj_t * ui_Label1;
+// SCREEN: ui_mainscreen
+void ui_mainscreen_screen_init(void);
+extern lv_obj_t * ui_mainscreen;
+void ui_event_mainscreen_btnscript1(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnscript1;
+extern lv_obj_t * ui_mainscreen_lblscript1;
+void ui_event_mainscreen_btnscript2(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnscript2;
+extern lv_obj_t * ui_mainscreen_lblscript2;
+void ui_event_mainscreen_btnscript3(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnscript3;
+extern lv_obj_t * ui_mainscreen_lblscript3;
+void ui_event_mainscreen_btnscript4(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnscript4;
+extern lv_obj_t * ui_mainscreen_lblscript4;
+void ui_event_mainscreen_btnscript5(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnscript5;
+extern lv_obj_t * ui_mainscreen_lblscript5;
+void ui_event_mainscreen_btnscript6(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnscript6;
+extern lv_obj_t * ui_mainscreen_lblscript6;
+void ui_event_mainscreen_btnscript7(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnscript7;
+extern lv_obj_t * ui_mainscreen_lblscript7;
+void ui_event_mainscreen_btnscript8(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnscript8;
+extern lv_obj_t * ui_mainscreen_lblscript8;
+void ui_event_mainscreen_btnscript9(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnscript9;
+extern lv_obj_t * ui_mainscreen_lblscript9;
+void ui_event_mainscreen_btnpanicstop(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnpanicstop;
+extern lv_obj_t * ui_mainscreen_lblpanicstop;
+void ui_event_mainscreen_btnback(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnback;
+extern lv_obj_t * ui_mainscreen_image1;
+void ui_event_mainscreen_btnforward(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnforward;
+extern lv_obj_t * ui_mainscreen_image2;
+extern lv_obj_t * ui_mainscreen_btnwifi;
+void ui_event_mainscreen_btnsettings(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnsettings;
+extern lv_obj_t * ui_mainscreen_image3;
+// SCREEN: ui_settingsscreen
+void ui_settingsscreen_screen_init(void);
+extern lv_obj_t * ui_settingsscreen;
+extern lv_obj_t * ui_settingsscreen_cbxssids;
+void ui_event_settingsscreen_txtuser(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_txtuser;
+void ui_event_settingsscreen_txtpassword(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_txtpassword;
+void ui_event_settingsscreen_btnwifiscan(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_btnwifiscan;
+extern lv_obj_t * ui_settingsscreen_lblwifiscan;
+extern lv_obj_t * ui_settingsscreen_spnwifi;
+void ui_event_settingsscreen_btnwificonnect(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_btnwificonnect;
+extern lv_obj_t * ui_settingsscreen_lblwificonnect;
+void ui_event_settingsscreen_btnsync(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_btnsync;
+extern lv_obj_t * ui_settingsscreen_lblsync;
+void ui_event_settingsscreen_btnclose(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_btnclose;
+extern lv_obj_t * ui_settingsscreen_lblclose;
+void ui_event_settingsscreen_kbdsettings(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_kbdsettings;
 extern lv_obj_t * ui____initial_actions0;
 
 
+LV_IMG_DECLARE(ui_img_button_png);    // assets/button.png
+LV_IMG_DECLARE(ui_img_gear_png);    // assets/gear.png
 
 
 
 
 
-void ui_init(lv_disp_t *disp);
+
+void ui_init(lv_disp_t * dispp);
 
 #ifdef __cplusplus
 } /*extern "C"*/
