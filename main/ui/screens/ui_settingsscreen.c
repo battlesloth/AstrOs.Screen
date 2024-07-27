@@ -58,7 +58,7 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_set_height(ui_settingsscreen_lblwifiscan, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_settingsscreen_lblwifiscan, LV_ALIGN_CENTER);
     lv_label_set_text(ui_settingsscreen_lblwifiscan, "WiFi Scan");
-    lv_obj_set_style_text_font(ui_settingsscreen_lblwifiscan, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_settingsscreen_lblwifiscan, &ui_font_StarJedi_28, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_settingsscreen_spnwifi = lv_spinner_create(ui_settingsscreen, 1000, 90);
     lv_obj_set_width(ui_settingsscreen_spnwifi, 70);
@@ -84,7 +84,7 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_set_height(ui_settingsscreen_lblwificonnect, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_settingsscreen_lblwificonnect, LV_ALIGN_CENTER);
     lv_label_set_text(ui_settingsscreen_lblwificonnect, "Connect");
-    lv_obj_set_style_text_font(ui_settingsscreen_lblwificonnect, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_settingsscreen_lblwificonnect, &ui_font_StarJedi_28, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_settingsscreen_btnsync = lv_btn_create(ui_settingsscreen);
     lv_obj_set_width(ui_settingsscreen_btnsync, 180);
@@ -98,7 +98,7 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_set_height(ui_settingsscreen_lblsync, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_settingsscreen_lblsync, LV_ALIGN_CENTER);
     lv_label_set_text(ui_settingsscreen_lblsync, "Sync");
-    lv_obj_set_style_text_font(ui_settingsscreen_lblsync, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_settingsscreen_lblsync, &ui_font_StarJedi_28, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_settingsscreen_btnclose = lv_btn_create(ui_settingsscreen);
     lv_obj_set_width(ui_settingsscreen_btnclose, 180);
@@ -112,7 +112,7 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_set_height(ui_settingsscreen_lblclose, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_settingsscreen_lblclose, LV_ALIGN_CENTER);
     lv_label_set_text(ui_settingsscreen_lblclose, "Close");
-    lv_obj_set_style_text_font(ui_settingsscreen_lblclose, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_settingsscreen_lblclose, &ui_font_StarJedi_28, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_settingsscreen_kbdsettings = lv_keyboard_create(ui_settingsscreen);
     lv_obj_set_width(ui_settingsscreen_kbdsettings, 800);

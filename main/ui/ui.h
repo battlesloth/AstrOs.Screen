@@ -99,6 +99,7 @@ LV_IMG_DECLARE(ui_img_gear_png);    // assets/gear.png
 
 
 
+LV_FONT_DECLARE(ui_font_StarJedi_28);
 
 
 

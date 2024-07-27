@@ -287,12 +287,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": -809864586,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -314,6 +308,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": -809864586,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL"
@@ -929,12 +929,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": -182314370,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -956,6 +950,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": -182314370,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL"
@@ -1573,12 +1573,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": -1039170737,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -1600,6 +1594,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": -1039170737,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL"
@@ -2217,12 +2217,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": 319145891,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -2244,6 +2238,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": 319145891,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL"
@@ -2861,12 +2861,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": -1111705063,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -2888,6 +2882,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": -1111705063,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL"
@@ -3505,12 +3505,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": -1338223244,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -3532,6 +3526,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": -1338223244,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL"
@@ -4149,12 +4149,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": 1237986431,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -4176,6 +4170,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": 1237986431,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL"
@@ -4793,12 +4793,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": 603012469,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -4820,6 +4814,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": 603012469,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL"
@@ -5437,12 +5437,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": -1745822718,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -5464,6 +5458,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": -1745822718,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL"
@@ -6081,12 +6081,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": -1764236504,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -6097,7 +6091,7 @@
                           {
                             "nid": -910569885,
                             "strtype": "_style/Text_Font",
-                            "strval": "montserrat_32",
+                            "strval": "StarJedi_28",
                             "InheritedType": 3
                           }
                         ],
@@ -6108,6 +6102,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": -1764236504,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL"
@@ -6462,7 +6462,8 @@
                 "InheritedType": 4
               }
             ],
-            "saved_objtypeKey": "BUTTON"
+            "saved_objtypeKey": "BUTTON",
+            "tree_closed": true
           },
           {
             "guid": "GUID19795994-296589S3213196",
@@ -9681,6 +9682,12 @@
                 "InheritedType": 11
               },
               {
+                "nid": -550809461,
+                "strtype": "TEXTAREA/TextAlign",
+                "strval": "TOP_LEFT",
+                "InheritedType": 3
+              },
+              {
                 "disabled": false,
                 "nid": 284153125,
                 "strtype": "_event/EventHandler",
@@ -10166,6 +10173,12 @@
                 "InheritedType": 11
               },
               {
+                "nid": 876307755,
+                "strtype": "TEXTAREA/TextAlign",
+                "strval": "TOP_LEFT",
+                "InheritedType": 3
+              },
+              {
                 "disabled": false,
                 "nid": -906507114,
                 "strtype": "_event/EventHandler",
@@ -10585,12 +10598,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": -1011178002,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -10601,7 +10608,7 @@
                           {
                             "nid": 214573539,
                             "strtype": "_style/Text_Font",
-                            "strval": "montserrat_28",
+                            "strval": "StarJedi_28",
                             "InheritedType": 3
                           }
                         ],
@@ -10612,6 +10619,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": -1011178002,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL",
@@ -11465,12 +11478,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": 511622716,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -11481,7 +11488,7 @@
                           {
                             "nid": -101375828,
                             "strtype": "_style/Text_Font",
-                            "strval": "montserrat_28",
+                            "strval": "StarJedi_28",
                             "InheritedType": 3
                           }
                         ],
@@ -11492,6 +11499,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": 511622716,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL",
@@ -12109,12 +12122,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": 670200915,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -12125,7 +12132,7 @@
                           {
                             "nid": 89277688,
                             "strtype": "_style/Text_Font",
-                            "strval": "montserrat_28",
+                            "strval": "StarJedi_28",
                             "InheritedType": 3
                           }
                         ],
@@ -12136,6 +12143,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": 670200915,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL",
@@ -12753,12 +12766,6 @@
                     "InheritedType": 10
                   },
                   {
-                    "nid": -1433016724,
-                    "strtype": "LABEL/Recolor",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
                     "part": "lv.PART.MAIN",
                     "childs": [
                       {
@@ -12769,7 +12776,7 @@
                           {
                             "nid": -781790129,
                             "strtype": "_style/Text_Font",
-                            "strval": "montserrat_28",
+                            "strval": "StarJedi_28",
                             "InheritedType": 3
                           }
                         ],
@@ -12780,6 +12787,12 @@
                     "strtype": "LABEL/Style_main",
                     "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "nid": -1433016724,
+                    "strtype": "LABEL/Recolor",
+                    "strval": "False",
+                    "InheritedType": 2
                   }
                 ],
                 "saved_objtypeKey": "LABEL",
@@ -13126,7 +13139,8 @@
                 "InheritedType": 4
               }
             ],
-            "saved_objtypeKey": "BUTTON"
+            "saved_objtypeKey": "BUTTON",
+            "tree_closed": true
           },
           {
             "guid": "GUID17733447-570851S291703196",
@@ -13726,7 +13740,7 @@
     "shape": "RECTANGLE",
     "multilang": "DISABLE",
     "description": "",
-    "board": "DIS07050H - ESP32 5inch HMI Display 800x480 RGB - ESP-IDF",
+    "board": "DIS08070H - ESP32 7inch HMI Intelligent Touch-Screen 800x480 RGB - Arduino-IDE",
     "board_version": "v1.0.0",
     "editor_version": "1.4.1",
     "image": "",
@@ -13738,11 +13752,11 @@
     "theme_dark": true,
     "theme_color1": 5,
     "theme_color2": 0,
-    "uiExportFolderPath": "D:\\Source\\AstrOs\\AstrOs.Screen\\main\\ui",
-    "projectExportFolderPath": "D:\\Source\\AstrOs\\AstrOs.Screen",
-    "backup_cnt": 61,
+    "uiExportFolderPath": "D:\\Source\\AstrOs\\AstrOs.Screen\\ESP\\src\\UI",
+    "projectExportFolderPath": "D:\\Source\\AstrOs\\AstrOs.Screen\\ESP",
+    "backup_cnt": 54,
     "autosave_cnt": 0,
-    "lvgl_version": "8.3.11",
+    "lvgl_version": "8.3.6",
     "callfuncsexport": "CPP_FILE",
     "imageexport": "SOURCE",
     "lvgl_include_path": "",

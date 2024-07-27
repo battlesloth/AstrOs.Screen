@@ -3,7 +3,9 @@ SET(SOURCES screens/ui_mainscreen.c
     ui.c
     components/ui_comp_hook.c
     ui_helpers.c
+    ui_events.c
     images/ui_img_button_png.c
-    images/ui_img_gear_png.c)
+    images/ui_img_gear_png.c
+    fonts/ui_font_StarJedi_28.c)
 
 add_library(ui ${SOURCES})

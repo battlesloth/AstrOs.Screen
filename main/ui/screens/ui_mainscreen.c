@@ -143,7 +143,7 @@ void ui_mainscreen_screen_init(void)
     lv_obj_set_y(ui_mainscreen_lblpanicstop, -3);
     lv_obj_set_align(ui_mainscreen_lblpanicstop, LV_ALIGN_CENTER);
     lv_label_set_text(ui_mainscreen_lblpanicstop, "panic stop");
-    lv_obj_set_style_text_font(ui_mainscreen_lblpanicstop, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mainscreen_lblpanicstop, &ui_font_StarJedi_28, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_mainscreen_btnback = lv_btn_create(ui_mainscreen);
     lv_obj_set_width(ui_mainscreen_btnback, 120);
