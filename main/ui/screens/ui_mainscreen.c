@@ -206,6 +206,14 @@ void ui_mainscreen_screen_init(void)
     lv_obj_add_flag(ui_mainscreen_image3, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_mainscreen_image3, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
+    ui_mainscreen_mainmodal = ui_mainmodal_create(ui_mainscreen);
+    lv_obj_set_x(ui_mainscreen_mainmodal, 0);
+    lv_obj_set_y(ui_mainscreen_mainmodal, 0);
+
+
+
+
+
     lv_obj_add_event_cb(ui_mainscreen_btnscript1, ui_event_mainscreen_btnscript1, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_mainscreen_btnscript2, ui_event_mainscreen_btnscript2, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_mainscreen_btnscript3, ui_event_mainscreen_btnscript3, LV_EVENT_ALL, NULL);

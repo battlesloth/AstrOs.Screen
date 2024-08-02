@@ -23,6 +23,8 @@ extern "C" {
 #endif
 
 #include "ui_helpers.h"
+#include "components/ui_comp.h"
+#include "components/ui_comp_hook.h"
 #include "ui_events.h"
 
 // SCREEN: ui_mainscreen
@@ -68,12 +70,12 @@ extern lv_obj_t * ui_mainscreen_btnwifi;
 void ui_event_mainscreen_btnsettings(lv_event_t * e);
 extern lv_obj_t * ui_mainscreen_btnsettings;
 extern lv_obj_t * ui_mainscreen_image3;
+extern lv_obj_t * ui_mainscreen_mainmodal;
 // SCREEN: ui_settingsscreen
 void ui_settingsscreen_screen_init(void);
 extern lv_obj_t * ui_settingsscreen;
+void ui_event_settingsscreen_cbxssids(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_cbxssids;
-void ui_event_settingsscreen_txtuser(lv_event_t * e);
-extern lv_obj_t * ui_settingsscreen_txtuser;
 void ui_event_settingsscreen_txtpassword(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_txtpassword;
 void ui_event_settingsscreen_btnwifiscan(lv_event_t * e);
@@ -91,6 +93,7 @@ extern lv_obj_t * ui_settingsscreen_btnclose;
 extern lv_obj_t * ui_settingsscreen_lblclose;
 void ui_event_settingsscreen_kbdsettings(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_kbdsettings;
+extern lv_obj_t * ui_settingsscreen_settingsmodal;
 extern lv_obj_t * ui____initial_actions0;
 
 

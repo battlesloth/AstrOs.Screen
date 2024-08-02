@@ -18,27 +18,17 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_set_x(ui_settingsscreen_cbxssids, 60);
     lv_obj_set_y(ui_settingsscreen_cbxssids, 24);
     lv_obj_add_flag(ui_settingsscreen_cbxssids, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_scroll_dir(ui_settingsscreen_cbxssids, LV_DIR_VER);
     lv_obj_set_style_text_font(ui_settingsscreen_cbxssids, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_set_style_text_font(lv_dropdown_get_list(ui_settingsscreen_cbxssids), &lv_font_montserrat_28,
                                LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_settingsscreen_txtuser = lv_textarea_create(ui_settingsscreen);
-    lv_obj_set_width(ui_settingsscreen_txtuser, 480);
-    lv_obj_set_height(ui_settingsscreen_txtuser, LV_SIZE_CONTENT);    /// 70
-    lv_obj_set_x(ui_settingsscreen_txtuser, 60);
-    lv_obj_set_y(ui_settingsscreen_txtuser, 104);
-    lv_textarea_set_placeholder_text(ui_settingsscreen_txtuser, "Username");
-    lv_textarea_set_one_line(ui_settingsscreen_txtuser, true);
-    lv_obj_set_style_text_font(ui_settingsscreen_txtuser, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-
-
     ui_settingsscreen_txtpassword = lv_textarea_create(ui_settingsscreen);
     lv_obj_set_width(ui_settingsscreen_txtpassword, 480);
     lv_obj_set_height(ui_settingsscreen_txtpassword, LV_SIZE_CONTENT);    /// 70
     lv_obj_set_x(ui_settingsscreen_txtpassword, 60);
-    lv_obj_set_y(ui_settingsscreen_txtpassword, 184);
+    lv_obj_set_y(ui_settingsscreen_txtpassword, 104);
     lv_textarea_set_placeholder_text(ui_settingsscreen_txtpassword, "Password");
     lv_textarea_set_one_line(ui_settingsscreen_txtpassword, true);
     lv_textarea_set_password_mode(ui_settingsscreen_txtpassword, true);
@@ -118,15 +108,24 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_set_width(ui_settingsscreen_kbdsettings, 800);
     lv_obj_set_height(ui_settingsscreen_kbdsettings, 240);
     lv_obj_set_align(ui_settingsscreen_kbdsettings, LV_ALIGN_BOTTOM_MID);
+    lv_obj_add_state(ui_settingsscreen_kbdsettings, LV_STATE_USER_3);       /// States
     lv_obj_add_flag(ui_settingsscreen_kbdsettings, LV_OBJ_FLAG_HIDDEN);     /// Flags
 
-    lv_obj_add_event_cb(ui_settingsscreen_txtuser, ui_event_settingsscreen_txtuser, LV_EVENT_ALL, NULL);
+    ui_settingsscreen_settingsmodal = ui_mainmodal_create(ui_settingsscreen);
+    lv_obj_set_x(ui_settingsscreen_settingsmodal, 0);
+    lv_obj_set_y(ui_settingsscreen_settingsmodal, 0);
+
+
+
+
+
+    lv_obj_add_event_cb(ui_settingsscreen_cbxssids, ui_event_settingsscreen_cbxssids, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_settingsscreen_txtpassword, ui_event_settingsscreen_txtpassword, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_settingsscreen_btnwifiscan, ui_event_settingsscreen_btnwifiscan, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_settingsscreen_btnwificonnect, ui_event_settingsscreen_btnwificonnect, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_settingsscreen_btnsync, ui_event_settingsscreen_btnsync, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_settingsscreen_btnclose, ui_event_settingsscreen_btnclose, LV_EVENT_ALL, NULL);
-    lv_keyboard_set_textarea(ui_settingsscreen_kbdsettings, ui_settingsscreen_txtuser);
+    lv_keyboard_set_textarea(ui_settingsscreen_kbdsettings, ui_settingsscreen_txtpassword);
     lv_obj_add_event_cb(ui_settingsscreen_kbdsettings, ui_event_settingsscreen_kbdsettings, LV_EVENT_ALL, NULL);
 
 }

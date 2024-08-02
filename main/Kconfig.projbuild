@@ -1,7 +1,7 @@
 menu "LCD Configuration"
     config LCD_DOUBLE_FB
         bool "Use double Frame Buffer"
-        default "n"
+        default "y"
         help
             Enable this option, driver will allocate two frame buffers.
 
