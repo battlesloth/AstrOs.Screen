@@ -35,18 +35,49 @@ void app_main()
 
   ESP_ERROR_CHECK(storageManager.Init());
 
+  svc_config_t svcConfig;
+  auto cfigLoaded(storageManager.loadServiceConfig(&svcConfig));
+
   WZ8048C050_Init();
   ui_init();
+  lv_timer_handler();
 
   wifiQueue = xQueueCreate(QUEUE_LENGTH, sizeof(astros_wifi_message_t));
   uiQueue = xQueueCreate(QUEUE_LENGTH, sizeof(astros_ui_message_t));
 
   wifiController.Init(uiQueue);
-
+  
   xTaskCreate(&wifiTask, "wifiTask", 4096, (void *)wifiQueue, 9, NULL);
-
   xTaskCreate(&uiUpdateTask, "uiUpdateTask", 4096, (void *)uiQueue, 8, NULL);
   xTaskCreate(&lvglTask, "lvglTask", 4096, NULL, 10, NULL);
+
+  if (cfigLoaded)
+  {
+    ESP_LOGI(TAG, "Service Config Loaded");
+    if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+    {
+      lv_dropdown_add_option(ui_settingsscreen_cbxssids, svcConfig.ssid, 0);
+      lv_dropdown_set_selected(ui_settingsscreen_cbxssids, 0);
+      lv_dropdown_set_text(ui_settingsscreen_cbxssids, NULL);
+      lv_textarea_set_text(ui_settingsscreen_txtpassword, svcConfig.password);
+      xSemaphoreGive(xGuiSemaphore);
+    }
+
+    if (svcConfig.ssid[0] != '\0')
+    {
+      astros_wifi_message_t msg;
+      msg.type = AstrOsWifiMessageType::CONNECT;
+      msg.message = nullptr;
+      if (xQueueSend(wifiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
+      {
+        free(msg.message);
+      }
+    }
+  }
+  else
+  {
+    ESP_LOGI(TAG, "Service Config Not Loaded");
+  }
 }
 
 void lvglTask(void *arg)
@@ -94,10 +125,25 @@ void wifiTask(void *arg)
         {
           lv_dropdown_get_selected_str(ui_settingsscreen_cbxssids, ssid, 33);
           auto txt = lv_textarea_get_text(ui_settingsscreen_txtpassword);
+
+          ESP_LOGI(TAG, "PWD: %s", txt);
+
           pass = txt;
 
           xSemaphoreGive(xGuiSemaphore);
         }
+
+        svc_config_t svcConfig;
+
+        memcpy(svcConfig.ssid, ssid, 33);
+        svcConfig.ssid[32] = '\0';
+
+        auto passLen = pass.length() <= 64 ? pass.length() : 64;
+        memcpy(svcConfig.password, pass.c_str(), passLen);
+        svcConfig.password[passLen] = '\0';
+
+        storageManager.saveServiceConfig(svcConfig);
+
         wifiController.Connect(ssid, pass);
         break;
       }
@@ -184,10 +230,21 @@ void uiUpdateTask(void *arg)
       {
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
         {
-          lv_label_set_text(ui_settingsscreen_settingsmodal, msg.message);
-          lv_label_set_text(ui_mainscreen_mainmodal, msg.message);
-          lv_obj_clear_flag(ui_mainscreen_mainmodal, LV_OBJ_FLAG_HIDDEN);
-          lv_obj_clear_flag(ui_settingsscreen_settingsmodal, LV_OBJ_FLAG_HIDDEN);
+          // lvgl calls free on the value passed so we need to copy it
+          char val[strlen(msg.message) + 1];
+
+          memcpy(val, msg.message, strlen(msg.message) + 1);
+
+          //lv_label_set_text(ui_settingsscreen_settingserrormessage, "Test");
+          ///lv_label_set_text(ui_mainscreen_mainerrormessage, "Test");
+
+    
+            lv_label_set_text(ui_settingsscreen_lblerrormessage, val);
+            lv_obj_clear_flag(ui_settingsscreen_settingserrormodal, LV_OBJ_FLAG_HIDDEN);
+ 
+            lv_label_set_text(ui_mainscreen_lblerrormessage, val);
+            lv_obj_clear_flag(ui_mainscreen_mainerrormodal, LV_OBJ_FLAG_HIDDEN);
+          
           xSemaphoreGive(xGuiSemaphore);
         }
         break;
@@ -204,10 +261,17 @@ void uiUpdateTask(void *arg)
 
 //========== UI Methods ==========
 
-void onScript1(lv_event_t *e) {
+void onScript1(lv_event_t *e)
+{
   astros_ui_message_t msg;
   msg.type = AstrOsUiMessageType::MODAL_MESSAGE;
-  msg.message = strdup("Script 1");
+  
+  std::string id = "script 1";
+  
+  msg.message = (char *)malloc(id.size() + 1); // dummy data
+  memccpy(msg.message, id.c_str(), 0, id.size());
+  msg.message[id.size()] = '\0';
+  
   if (xQueueSend(uiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
   {
     free(msg.message);
@@ -250,13 +314,13 @@ void onWifiConnect(lv_event_t *e)
     free(msg.message);
   }
 }
+
 void onSyncScripts(lv_event_t *e) {}
 
 void onCbxSSIDChanged(lv_event_t *e)
 {
   auto *cbx = lv_event_get_target(e);
   lv_dropdown_set_text(cbx, NULL);
-  xSemaphoreGive(xGuiSemaphore);
 }
 
 void onKbdPressed(lv_event_t *e)
@@ -281,8 +345,9 @@ void onKbdPressed(lv_event_t *e)
   }
 }
 
-void onModalClick(lv_event_t *e)
+void onErrorAck(lv_event_t *e)
 {
-  lv_obj_add_flag(ui_mainscreen_mainmodal, LV_OBJ_FLAG_HIDDEN);
-  lv_obj_add_flag(ui_settingsscreen_settingsmodal, LV_OBJ_FLAG_HIDDEN);
+  ESP_LOGI(TAG, "Modal Clicked");
+  lv_obj_add_flag(ui_mainscreen_mainerrormodal, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_add_flag(ui_settingsscreen_settingserrormodal, LV_OBJ_FLAG_HIDDEN);
 }

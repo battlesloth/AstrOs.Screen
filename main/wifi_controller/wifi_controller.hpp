@@ -20,6 +20,7 @@ public:
     void Init(QueueHandle_t queue);
     void Scan();
     bool Connect(std::string ssid, std::string password);
+    void Disconnect();
     void OnConnected();
     void OnConnecting();
     void OnDisconnected();

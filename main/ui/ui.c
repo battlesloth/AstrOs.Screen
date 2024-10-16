@@ -52,7 +52,11 @@ lv_obj_t * ui_mainscreen_btnwifi;
 void ui_event_mainscreen_btnsettings(lv_event_t * e);
 lv_obj_t * ui_mainscreen_btnsettings;
 lv_obj_t * ui_mainscreen_image3;
-lv_obj_t * ui_mainscreen_mainmodal;
+lv_obj_t * ui_mainscreen_mainerrormodal;
+lv_obj_t * ui_mainscreen_coverpanel1;
+void ui_event_mainscreen_btnerrorack(lv_event_t * e);
+lv_obj_t * ui_mainscreen_btnerrorack;
+lv_obj_t * ui_mainscreen_lblerrormessage;
 
 
 // SCREEN: ui_settingsscreen
@@ -77,7 +81,12 @@ lv_obj_t * ui_settingsscreen_btnclose;
 lv_obj_t * ui_settingsscreen_lblclose;
 void ui_event_settingsscreen_kbdsettings(lv_event_t * e);
 lv_obj_t * ui_settingsscreen_kbdsettings;
-lv_obj_t * ui_settingsscreen_settingsmodal;
+lv_obj_t * ui_settingsscreen_settingserrormodal;
+lv_obj_t * ui_settingsscreen_coverpanel2;
+void ui_event_settingsscreen_btnerrorack(lv_event_t * e);
+lv_obj_t * ui_settingsscreen_btnerrorack;
+void ui_event_settingsscreen_lblerrormessage(lv_event_t * e);
+lv_obj_t * ui_settingsscreen_lblerrormessage;
 lv_obj_t * ui____initial_actions0;
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
@@ -195,6 +204,14 @@ void ui_event_mainscreen_btnsettings(lv_event_t * e)
         _ui_screen_change(&ui_settingsscreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 500, 0, &ui_settingsscreen_screen_init);
     }
 }
+void ui_event_mainscreen_btnerrorack(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        onErrorAck(e);
+    }
+}
 void ui_event_settingsscreen_cbxssids(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -254,13 +271,27 @@ void ui_event_settingsscreen_kbdsettings(lv_event_t * e)
         onKbdPressed(e);
     }
 }
+void ui_event_settingsscreen_btnerrorack(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        onErrorAck(e);
+    }
+}
+void ui_event_settingsscreen_lblerrormessage(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        onErrorAck(e);
+    }
+}
 
 ///////////////////// SCREENS ////////////////////
 
 void ui_init(void)
 {
-    LV_EVENT_GET_COMP_CHILD = lv_event_register_id();
-
     lv_disp_t * dispp = lv_disp_get_default();
     lv_theme_t * theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
                                                true, LV_FONT_DEFAULT);

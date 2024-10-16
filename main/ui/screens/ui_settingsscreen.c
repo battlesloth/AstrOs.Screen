@@ -111,13 +111,38 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_add_state(ui_settingsscreen_kbdsettings, LV_STATE_USER_3);       /// States
     lv_obj_add_flag(ui_settingsscreen_kbdsettings, LV_OBJ_FLAG_HIDDEN);     /// Flags
 
-    ui_settingsscreen_settingsmodal = ui_mainmodal_create(ui_settingsscreen);
-    lv_obj_set_x(ui_settingsscreen_settingsmodal, 0);
-    lv_obj_set_y(ui_settingsscreen_settingsmodal, 0);
+    ui_settingsscreen_settingserrormodal = lv_obj_create(ui_settingsscreen);
+    lv_obj_remove_style_all(ui_settingsscreen_settingserrormodal);
+    lv_obj_set_width(ui_settingsscreen_settingserrormodal, 800);
+    lv_obj_set_height(ui_settingsscreen_settingserrormodal, 480);
+    lv_obj_set_align(ui_settingsscreen_settingserrormodal, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_settingsscreen_settingserrormodal, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_clear_flag(ui_settingsscreen_settingserrormodal, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
+    ui_settingsscreen_coverpanel2 = lv_obj_create(ui_settingsscreen_settingserrormodal);
+    lv_obj_set_width(ui_settingsscreen_coverpanel2, 800);
+    lv_obj_set_height(ui_settingsscreen_coverpanel2, 480);
+    lv_obj_set_align(ui_settingsscreen_coverpanel2, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_settingsscreen_coverpanel2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_radius(ui_settingsscreen_coverpanel2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_settingsscreen_coverpanel2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_settingsscreen_coverpanel2, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_settingsscreen_btnerrorack = lv_btn_create(ui_settingsscreen_coverpanel2);
+    lv_obj_set_width(ui_settingsscreen_btnerrorack, 400);
+    lv_obj_set_height(ui_settingsscreen_btnerrorack, 200);
+    lv_obj_set_align(ui_settingsscreen_btnerrorack, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_settingsscreen_btnerrorack, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_settingsscreen_btnerrorack, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_settingsscreen_btnerrorack, lv_color_hex(0x353535), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_settingsscreen_btnerrorack, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-
+    ui_settingsscreen_lblerrormessage = lv_label_create(ui_settingsscreen_btnerrorack);
+    lv_obj_set_width(ui_settingsscreen_lblerrormessage, 340);
+    lv_obj_set_height(ui_settingsscreen_lblerrormessage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_settingsscreen_lblerrormessage, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_align(ui_settingsscreen_lblerrormessage, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_settingsscreen_lblerrormessage, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_settingsscreen_cbxssids, ui_event_settingsscreen_cbxssids, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_settingsscreen_txtpassword, ui_event_settingsscreen_txtpassword, LV_EVENT_ALL, NULL);
@@ -127,5 +152,7 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_add_event_cb(ui_settingsscreen_btnclose, ui_event_settingsscreen_btnclose, LV_EVENT_ALL, NULL);
     lv_keyboard_set_textarea(ui_settingsscreen_kbdsettings, ui_settingsscreen_txtpassword);
     lv_obj_add_event_cb(ui_settingsscreen_kbdsettings, ui_event_settingsscreen_kbdsettings, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_settingsscreen_lblerrormessage, ui_event_settingsscreen_lblerrormessage, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_settingsscreen_btnerrorack, ui_event_settingsscreen_btnerrorack, LV_EVENT_ALL, NULL);
 
 }

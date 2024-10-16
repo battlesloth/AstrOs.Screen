@@ -6,6 +6,7 @@
 #include "../utility/astros_util.h"
 
 #define TAG "AstrOs Wifi Controller"
+static bool intentionalDisconnect = false;
 
 #define DEFAULT_SCAN_LIST_SIZE 20
 
@@ -18,14 +19,28 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
         switch (event_id)
         {
         case WIFI_EVENT_STA_START:
+        {
             ESP_LOGI(TAG, "WIFI_EVENT_STA_START");
-            //esp_wifi_connect();
+            //esp_err_t err = esp_wifi_connect();
+            //logError(TAG, __FUNCTION__, __LINE__, err);
             break;
+        }
         case WIFI_EVENT_STA_CONNECTED:
+        {
             ESP_LOGI(TAG, "WIFI_EVENT_STA_CONNECTED");
             break;
+        }
         case WIFI_EVENT_STA_DISCONNECTED:
-            if (wifiController.GetRetries() < 5)
+        {
+            wifi_event_sta_disconnected_t *event = (wifi_event_sta_disconnected_t *)event_data;
+            ESP_LOGI(TAG, "WIFI STA disconnected, Reason:%d.", event->reason);
+            
+            if (intentionalDisconnect)
+            {
+                ESP_LOGI(TAG, "WIFI_EVENT_STA_DISCONNECTED - intentional disconnect");
+                intentionalDisconnect = false;
+            }
+            else if (wifiController.GetRetries() < 5)
             {
                 ESP_LOGI(TAG, "WIFI_EVENT_STA_DISCONNECTED");
                 esp_wifi_connect();
@@ -38,6 +53,7 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
                 wifiController.OnDisconnected();
             }
             break;
+        }
         default:
             break;
         }
@@ -47,9 +63,11 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
         switch (event_id)
         {
         case IP_EVENT_STA_GOT_IP:
+        {
             ESP_LOGI(TAG, "IP_EVENT_STA_GOT_IP");
             wifiController.OnConnected();
             break;
+        }
         default:
             break;
         }
@@ -98,6 +116,14 @@ void WifiController::Scan()
 
     for (int i = 0; i < ap_count; i++)
     {
+        ESP_LOGI(TAG, "SSID: %s, Secuity: %d", ap_info[i].ssid, ap_info[i].authmode);
+
+        if (ap_info[i].authmode < 2)
+        {
+            ESP_LOGI(TAG, "Skipping network due to securty level");
+            continue;
+        }
+
         auto ssidSize = strlen((char *)ap_info[i].ssid) + 1;
         astros_ui_message_t msg;
         msg.type = AstrOsUiMessageType::SSID_DETECTED;
@@ -131,6 +157,9 @@ bool WifiController::Connect(std::string ssid, std::string password)
         .sta = {
             .ssid = "",
             .password = "",
+            .threshold = {
+                .authmode = WIFI_AUTH_WPA_PSK,
+                },
         },
     };
 
@@ -154,6 +183,14 @@ bool WifiController::Connect(std::string ssid, std::string password)
     }
 
     return true;
+}
+
+void WifiController::Disconnect()
+{
+    ESP_LOGI(TAG, "Disconnecting from wifi network");
+    intentionalDisconnect = true;
+    esp_err_t err = esp_wifi_disconnect();
+    logError(TAG, __FUNCTION__, __LINE__, err);
 }
 
 int WifiController::GetRetries()

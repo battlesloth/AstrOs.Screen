@@ -23,8 +23,6 @@ extern "C" {
 #endif
 
 #include "ui_helpers.h"
-#include "components/ui_comp.h"
-#include "components/ui_comp_hook.h"
 #include "ui_events.h"
 
 // SCREEN: ui_mainscreen
@@ -70,7 +68,11 @@ extern lv_obj_t * ui_mainscreen_btnwifi;
 void ui_event_mainscreen_btnsettings(lv_event_t * e);
 extern lv_obj_t * ui_mainscreen_btnsettings;
 extern lv_obj_t * ui_mainscreen_image3;
-extern lv_obj_t * ui_mainscreen_mainmodal;
+extern lv_obj_t * ui_mainscreen_mainerrormodal;
+extern lv_obj_t * ui_mainscreen_coverpanel1;
+void ui_event_mainscreen_btnerrorack(lv_event_t * e);
+extern lv_obj_t * ui_mainscreen_btnerrorack;
+extern lv_obj_t * ui_mainscreen_lblerrormessage;
 // SCREEN: ui_settingsscreen
 void ui_settingsscreen_screen_init(void);
 extern lv_obj_t * ui_settingsscreen;
@@ -93,7 +95,12 @@ extern lv_obj_t * ui_settingsscreen_btnclose;
 extern lv_obj_t * ui_settingsscreen_lblclose;
 void ui_event_settingsscreen_kbdsettings(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_kbdsettings;
-extern lv_obj_t * ui_settingsscreen_settingsmodal;
+extern lv_obj_t * ui_settingsscreen_settingserrormodal;
+extern lv_obj_t * ui_settingsscreen_coverpanel2;
+void ui_event_settingsscreen_btnerrorack(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_btnerrorack;
+void ui_event_settingsscreen_lblerrormessage(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_lblerrormessage;
 extern lv_obj_t * ui____initial_actions0;
 
 

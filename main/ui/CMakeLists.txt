@@ -1,6 +1,4 @@
-SET(SOURCES components/ui_comp_mainmodal.c
-    components/ui_comp.c
-    screens/ui_mainscreen.c
+SET(SOURCES screens/ui_mainscreen.c
     screens/ui_settingsscreen.c
     ui.c
     components/ui_comp_hook.c

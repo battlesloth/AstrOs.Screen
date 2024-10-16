@@ -84,8 +84,10 @@ bool nvsLoadServiceConfig(svc_config_t *config)
     err = nvs_get_str(nvsHandle, "ip", config->ip, &defaultSize);
     if (logError(TAG, __FUNCTION__, __LINE__, err))
     {
-        memcpy(config->ip, "error\0", 6);
-        result = false;
+        // IP can be blank since by default we assume the
+        // connection is direct to the device and not through
+        // a network
+        memcpy(config->ip, "\0", 6);
     }
 
     nvs_close(nvsHandle);

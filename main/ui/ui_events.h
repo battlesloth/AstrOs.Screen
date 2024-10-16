@@ -22,7 +22,7 @@ void onScript9(lv_event_t * e);
 void onPanicStop(lv_event_t * e);
 void onBack(lv_event_t * e);
 void onForward(lv_event_t * e);
-void onModalClick(lv_event_t * e);
+void onErrorAck(lv_event_t * e);
 void onCbxSSIDChanged(lv_event_t * e);
 void onWifiScan(lv_event_t * e);
 void onWifiConnect(lv_event_t * e);

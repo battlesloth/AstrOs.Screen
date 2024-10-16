@@ -1,5 +1,3 @@
-components/ui_comp_mainmodal.c
-components/ui_comp.c
 screens/ui_mainscreen.c
 screens/ui_settingsscreen.c
 ui.c
