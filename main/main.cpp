@@ -1,13 +1,15 @@
 #include "esp_log.h"
 #include <WZ8048C050.h>
 #include "lvgl.h"
+#include <nvs_flash.h>
+
 #include "ui/ui.h"
 #include "ui/ui_events.h"
 
 #include "messaging/astros_messaging.hpp"
 #include "wifi_controller/wifi_controller.hpp"
 #include "storage/storage_manager.hpp"
-#include <nvs_flash.h>
+#include "scripts/astros_script.hpp"
 
 #define TAG "AstrOs Screen"
 #define QUEUE_LENGTH 10
@@ -23,6 +25,10 @@ void lvglTask(void *arg);
 void uiUpdateTask(void *arg);
 void wifiTask(void *arg);
 
+//========== Methods ==========
+void setButtonNames();
+void setButtonNameFromString(lv_obj_t *btn, std::string name);
+
 extern "C"
 {
   void app_main(void);
@@ -30,26 +36,28 @@ extern "C"
 
 void app_main()
 {
-
   xGuiSemaphore = xSemaphoreCreateMutex();
+  wifiQueue = xQueueCreate(QUEUE_LENGTH, sizeof(astros_wifi_message_t));
+  uiQueue = xQueueCreate(QUEUE_LENGTH, sizeof(astros_ui_message_t));
 
   ESP_ERROR_CHECK(storageManager.Init());
 
   svc_config_t svcConfig;
   auto cfigLoaded(storageManager.loadServiceConfig(&svcConfig));
 
+  // load api key, if it exists, else create empty string
+  char apiKey[65] = "";
+  storageManager.loadApiKey(apiKey);
+
   WZ8048C050_Init();
   ui_init();
   lv_timer_handler();
 
-  wifiQueue = xQueueCreate(QUEUE_LENGTH, sizeof(astros_wifi_message_t));
-  uiQueue = xQueueCreate(QUEUE_LENGTH, sizeof(astros_ui_message_t));
-
-  wifiController.Init(uiQueue);
-  
-  xTaskCreate(&wifiTask, "wifiTask", 4096, (void *)wifiQueue, 9, NULL);
-  xTaskCreate(&uiUpdateTask, "uiUpdateTask", 4096, (void *)uiQueue, 8, NULL);
-  xTaskCreate(&lvglTask, "lvglTask", 4096, NULL, 10, NULL);
+  if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+  {
+    lv_textarea_set_text(ui_settingsscreen_txtapikey, apiKey);
+    xSemaphoreGive(xGuiSemaphore);
+  }
 
   if (cfigLoaded)
   {
@@ -78,6 +86,24 @@ void app_main()
   {
     ESP_LOGI(TAG, "Service Config Not Loaded");
   }
+
+  if (storageManager.fileExists("scripts.json"))
+  {
+    auto scriptBlob = storageManager.readFile("scripts.json");
+    script.LoadScript(scriptBlob);
+  }
+  else
+  {
+    ESP_LOGI(TAG, "Scripts file not found");
+  }
+
+  setButtonNames();
+
+  wifiController.Init(uiQueue);
+
+  xTaskCreate(&wifiTask, "wifiTask", 4096, (void *)wifiQueue, 9, NULL);
+  xTaskCreate(&uiUpdateTask, "uiUpdateTask", 4096, (void *)uiQueue, 8, NULL);
+  xTaskCreate(&lvglTask, "lvglTask", 4096, NULL, 10, NULL);
 }
 
 void lvglTask(void *arg)
@@ -235,18 +261,19 @@ void uiUpdateTask(void *arg)
 
           memcpy(val, msg.message, strlen(msg.message) + 1);
 
-          //lv_label_set_text(ui_settingsscreen_settingserrormessage, "Test");
-          ///lv_label_set_text(ui_mainscreen_mainerrormessage, "Test");
+          lv_label_set_text(ui_settingsscreen_lblerrormessage, val);
+          lv_obj_clear_flag(ui_settingsscreen_settingserrormodal, LV_OBJ_FLAG_HIDDEN);
 
-    
-            lv_label_set_text(ui_settingsscreen_lblerrormessage, val);
-            lv_obj_clear_flag(ui_settingsscreen_settingserrormodal, LV_OBJ_FLAG_HIDDEN);
- 
-            lv_label_set_text(ui_mainscreen_lblerrormessage, val);
-            lv_obj_clear_flag(ui_mainscreen_mainerrormodal, LV_OBJ_FLAG_HIDDEN);
-          
+          lv_label_set_text(ui_mainscreen_lblerrormessage, val);
+          lv_obj_clear_flag(ui_mainscreen_mainerrormodal, LV_OBJ_FLAG_HIDDEN);
+
           xSemaphoreGive(xGuiSemaphore);
         }
+        break;
+      }
+      case AstrOsUiMessageType::UPDATE_BUTTON_NAMES:
+      {
+        setButtonNames();
         break;
       }
       default:
@@ -261,17 +288,44 @@ void uiUpdateTask(void *arg)
 
 //========== UI Methods ==========
 
+void setButtonNames()
+{
+  setButtonNameFromString(ui_mainscreen_lblscript1, script.GetScriptName(1));
+  setButtonNameFromString(ui_mainscreen_lblscript2, script.GetScriptName(2));
+  setButtonNameFromString(ui_mainscreen_lblscript3, script.GetScriptName(3));
+  setButtonNameFromString(ui_mainscreen_lblscript4, script.GetScriptName(4));
+  setButtonNameFromString(ui_mainscreen_lblscript5, script.GetScriptName(5));
+  setButtonNameFromString(ui_mainscreen_lblscript6, script.GetScriptName(6));
+  setButtonNameFromString(ui_mainscreen_lblscript7, script.GetScriptName(7));
+  setButtonNameFromString(ui_mainscreen_lblscript8, script.GetScriptName(8));
+  setButtonNameFromString(ui_mainscreen_lblscript9, script.GetScriptName(9));
+}
+
+void setButtonNameFromString(lv_obj_t *btnLabel, std::string name)
+{
+  if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+  {
+    // lvgl calls free on the value passed so we need to copy it
+    auto len = strlen(name.c_str()) + 1;
+    char val[len];
+    memcpy(val, name.c_str(), len);
+
+    lv_label_set_text(btnLabel, val);
+    xSemaphoreGive(xGuiSemaphore);
+  }
+}
+
 void onScript1(lv_event_t *e)
 {
   astros_ui_message_t msg;
   msg.type = AstrOsUiMessageType::MODAL_MESSAGE;
-  
+
   std::string id = "script 1";
-  
+
   msg.message = (char *)malloc(id.size() + 1); // dummy data
   memccpy(msg.message, id.c_str(), 0, id.size());
   msg.message[id.size()] = '\0';
-  
+
   if (xQueueSend(uiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
   {
     free(msg.message);
@@ -286,8 +340,32 @@ void onScript7(lv_event_t *e) {}
 void onScript8(lv_event_t *e) {}
 void onScript9(lv_event_t *e) {}
 void onPanicStop(lv_event_t *e) {}
-void onBack(lv_event_t *e) {}
-void onForward(lv_event_t *e) {}
+
+void onBack(lv_event_t *e) {
+  script.DecrementPage();
+
+  astros_ui_message_t msg;
+  msg.type = AstrOsUiMessageType::UPDATE_BUTTON_NAMES;
+  msg.message = nullptr;
+
+  if (xQueueSend(uiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
+  {
+    free(msg.message);
+  }
+}
+
+void onForward(lv_event_t *e) {
+  script.IncrementPage();
+
+  astros_ui_message_t msg;
+  msg.type = AstrOsUiMessageType::UPDATE_BUTTON_NAMES;
+  msg.message = nullptr;
+
+  if (xQueueSend(uiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
+  {
+    free(msg.message);
+  }
+}
 
 void onWifiScan(lv_event_t *e)
 {
@@ -313,6 +391,13 @@ void onWifiConnect(lv_event_t *e)
   {
     free(msg.message);
   }
+}
+
+// when txt area loses focus, save the value
+void onApiKeyLostFocus(lv_event_t *e)
+{
+  auto txt = lv_textarea_get_text(ui_settingsscreen_txtapikey);
+  storageManager.saveApiKey(txt);
 }
 
 void onSyncScripts(lv_event_t *e) {}

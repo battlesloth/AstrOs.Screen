@@ -101,6 +101,8 @@ void ui_event_settingsscreen_btnerrorack(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_btnerrorack;
 void ui_event_settingsscreen_lblerrormessage(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_lblerrormessage;
+void ui_event_settingsscreen_txtapikey(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_txtapikey;
 extern lv_obj_t * ui____initial_actions0;
 
 

@@ -8,7 +8,8 @@ enum class AstrOsUiMessageType {
     WIFI_CONNECTING,
     WIFI_CONNECTED,
     WIFI_DISCONNECTED,
-    MODAL_MESSAGE
+    MODAL_MESSAGE,
+    UPDATE_BUTTON_NAMES
 };
 
 typedef struct {

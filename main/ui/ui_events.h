@@ -28,6 +28,7 @@ void onWifiScan(lv_event_t * e);
 void onWifiConnect(lv_event_t * e);
 void onSyncScripts(lv_event_t * e);
 void onKbdPressed(lv_event_t * e);
+void onApiKeyLostFocus(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -14,12 +14,6 @@ class AstrOsStorageManager
 private:
     esp_err_t mountSdCard();
     std::string setFilePath(std::string filename);
-    bool saveFileSd(std::string filename, std::string data);
-    bool deleteFileSd(std::string filename);
-    bool fileExistsSd(std::string filename);
-    std::string readFileSd(std::string filename);
-    std::vector<std::string> listFilesSd(std::string folder);
-
 public:
     AstrOsStorageManager();
     ~AstrOsStorageManager();
@@ -29,12 +23,15 @@ public:
     bool saveServiceConfig(svc_config_t config);
     bool clearServiceConfig();
 
+    bool saveApiKey(const char *apiKey);
+    bool loadApiKey(char *apiKey);
+
     bool saveFile(std::string filename, std::string data);
     bool deleteFile(std::string filename);
     bool fileExists(std::string filename);
-
     std::string readFile(std::string filename);
-
+    std::vector<std::string> listFiles(std::string folder);
+   
     bool formatSdCard();
 };
 

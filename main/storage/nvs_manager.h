@@ -24,6 +24,12 @@ extern "C"
     // clear the service configuration from NVS
     bool nvsClearServiceConfig();
 
+    // save api key to NVS
+    bool nvsSaveApiKey(const char *apiKey);
+
+    // load api key from NVS
+    bool nvsLoadApiKey(char *apiKey);
+
 #ifdef __cplusplus
 }
 #endif

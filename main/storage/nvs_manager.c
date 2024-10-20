@@ -127,3 +127,55 @@ bool nvsClearServiceConfig()
     nvs_close(nvsHandle);
     return true;
 }
+
+bool nvsSaveApiKey(const char *apiKey)
+{
+    esp_err_t err;
+    nvs_handle_t nvsHandle;
+
+    err = nvs_open("config", NVS_READWRITE, &nvsHandle);
+
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    err = nvs_set_str(nvsHandle, "apikey", apiKey);
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    nvs_close(nvsHandle);
+
+    return true;
+}
+
+bool nvsLoadApiKey(char *apiKey)
+{
+    esp_err_t err;
+    nvs_handle_t nvsHandle;
+    size_t defaultSize = 0;
+
+    err = nvs_open("config", NVS_READWRITE, &nvsHandle);
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    defaultSize = 65;
+    err = nvs_get_str(nvsHandle, "apikey", apiKey, &defaultSize);
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        memset(apiKey, "error\0", 6);
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    nvs_close(nvsHandle);
+
+    return true;
+}

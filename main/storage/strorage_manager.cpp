@@ -78,6 +78,17 @@ bool AstrOsStorageManager::clearServiceConfig()
     return nvsClearServiceConfig();
 }
 
+
+bool AstrOsStorageManager::saveApiKey(const char *apiKey)
+{
+    return nvsSaveApiKey(apiKey);
+}
+
+bool AstrOsStorageManager::loadApiKey(char *apiKey)
+{
+    return nvsLoadApiKey(apiKey);
+}
+
 /**************************************************************
  * SD Card methods
  ***************************************************************/
@@ -184,7 +195,7 @@ esp_err_t AstrOsStorageManager::mountSdCard()
     return err;
 }
 
-bool AstrOsStorageManager::saveFileSd(std::string filename, std::string data)
+bool AstrOsStorageManager::saveFile(std::string filename, std::string data)
 {
     FILE *fd = NULL;
 
@@ -214,7 +225,7 @@ bool AstrOsStorageManager::saveFileSd(std::string filename, std::string data)
     return true;
 }
 
-bool AstrOsStorageManager::deleteFileSd(std::string filename)
+bool AstrOsStorageManager::deleteFile(std::string filename)
 {
 
     std::string path = AstrOsStorageManager::setFilePath(filename);
@@ -228,14 +239,14 @@ bool AstrOsStorageManager::deleteFileSd(std::string filename)
     return true;
 }
 
-bool AstrOsStorageManager::fileExistsSd(std::string filename)
+bool AstrOsStorageManager::fileExists(std::string filename)
 {
     std::string path = AstrOsStorageManager::setFilePath(filename);
 
     return access(path.c_str(), F_OK) == 0;
 }
 
-std::string AstrOsStorageManager::readFileSd(std::string filename)
+std::string AstrOsStorageManager::readFile(std::string filename)
 {
     std::string path = AstrOsStorageManager::setFilePath(filename);
 
@@ -264,4 +275,54 @@ std::string AstrOsStorageManager::readFileSd(std::string filename)
     fclose(f);
 
     return result;
+}
+
+std::vector<std::string> AstrOsStorageManager::listFiles(std::string folder)
+{
+    std::vector<std::string> result;
+
+    const char *entrytype;
+    struct dirent *entry;
+    struct stat entry_stat;
+
+    std::string entryPath = AstrOsStorageManager::setFilePath(folder);
+
+    DIR *dir = opendir(entryPath.c_str());
+
+    if (!dir)
+    {
+        ESP_LOGE(TAG, "Failed to open dir %s", entryPath.c_str());
+        return result;
+    }
+
+    while ((entry = readdir(dir)) != NULL)
+    {
+        entrytype = (entry->d_type == DT_DIR ? "directory" : "file");
+
+        const char *ep = entryPath.c_str();
+
+        if (stat(ep, &entry_stat) == -1)
+        {
+            ESP_LOGE(TAG, "Failed to stat %s : %s", entrytype, entry->d_name);
+            continue;
+        }
+
+        result.push_back(entry->d_name);
+    }
+
+    closedir(dir);
+
+    return result;
+}
+
+/**************************************************************
+ * Utility methods
+ ***************************************************************/
+
+std::string AstrOsStorageManager::setFilePath(std::string filename)
+{
+
+    std::string out = MOUNT_POINT + std::string("/") + filename;
+
+    return out;
 }

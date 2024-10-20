@@ -87,6 +87,8 @@ void ui_event_settingsscreen_btnerrorack(lv_event_t * e);
 lv_obj_t * ui_settingsscreen_btnerrorack;
 void ui_event_settingsscreen_lblerrormessage(lv_event_t * e);
 lv_obj_t * ui_settingsscreen_lblerrormessage;
+void ui_event_settingsscreen_txtapikey(lv_event_t * e);
+lv_obj_t * ui_settingsscreen_txtapikey;
 lv_obj_t * ui____initial_actions0;
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
@@ -285,6 +287,20 @@ void ui_event_settingsscreen_lblerrormessage(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         onErrorAck(e);
+    }
+}
+void ui_event_settingsscreen_txtapikey(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_FOCUSED) {
+        _ui_keyboard_set_target(ui_settingsscreen_kbdsettings,  ui_settingsscreen_txtapikey);
+    }
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_flag_modify(ui_settingsscreen_kbdsettings, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+    }
+    if(event_code == LV_EVENT_DEFOCUSED) {
+        onApiKeyLostFocus(e);
     }
 }
 
