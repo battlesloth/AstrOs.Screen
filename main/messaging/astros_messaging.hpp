@@ -8,8 +8,10 @@ enum class AstrOsUiMessageType {
     WIFI_CONNECTING,
     WIFI_CONNECTED,
     WIFI_DISCONNECTED,
+    GET_WIFI_CREDS,
     MODAL_MESSAGE,
-    UPDATE_BUTTON_NAMES
+    UPDATE_BUTTON_NAMES,
+    SCRIPTS_RECEIVED
 };
 
 typedef struct {
@@ -22,7 +24,10 @@ enum class AstrOsWifiMessageType {
     SCAN_START,
     SCAN_COMPLETED,
     CONNECT,
-    DISCONNECT
+    DISCONNECT,
+    SYNC_SCRIPTS,
+    SCRIPT_COMMAND,
+    PANIC_STOP
 };
 
 typedef struct {

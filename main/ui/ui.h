@@ -95,14 +95,14 @@ extern lv_obj_t * ui_settingsscreen_btnclose;
 extern lv_obj_t * ui_settingsscreen_lblclose;
 void ui_event_settingsscreen_kbdsettings(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_kbdsettings;
+void ui_event_settingsscreen_txtapikey(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_txtapikey;
 extern lv_obj_t * ui_settingsscreen_settingserrormodal;
 extern lv_obj_t * ui_settingsscreen_coverpanel2;
 void ui_event_settingsscreen_btnerrorack(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_btnerrorack;
 void ui_event_settingsscreen_lblerrormessage(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_lblerrormessage;
-void ui_event_settingsscreen_txtapikey(lv_event_t * e);
-extern lv_obj_t * ui_settingsscreen_txtapikey;
 extern lv_obj_t * ui____initial_actions0;
 
 

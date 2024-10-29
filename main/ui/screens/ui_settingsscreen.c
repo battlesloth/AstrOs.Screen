@@ -111,6 +111,17 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_add_state(ui_settingsscreen_kbdsettings, LV_STATE_USER_3);       /// States
     lv_obj_add_flag(ui_settingsscreen_kbdsettings, LV_OBJ_FLAG_HIDDEN);     /// Flags
 
+    ui_settingsscreen_txtapikey = lv_textarea_create(ui_settingsscreen);
+    lv_obj_set_width(ui_settingsscreen_txtapikey, 480);
+    lv_obj_set_height(ui_settingsscreen_txtapikey, LV_SIZE_CONTENT);    /// 70
+    lv_obj_set_x(ui_settingsscreen_txtapikey, 60);
+    lv_obj_set_y(ui_settingsscreen_txtapikey, 184);
+    lv_textarea_set_placeholder_text(ui_settingsscreen_txtapikey, "API Key");
+    lv_textarea_set_one_line(ui_settingsscreen_txtapikey, true);
+    lv_obj_set_style_text_font(ui_settingsscreen_txtapikey, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+
+
     ui_settingsscreen_settingserrormodal = lv_obj_create(ui_settingsscreen);
     lv_obj_remove_style_all(ui_settingsscreen_settingserrormodal);
     lv_obj_set_width(ui_settingsscreen_settingserrormodal, 800);
@@ -144,17 +155,6 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_set_style_text_align(ui_settingsscreen_lblerrormessage, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_settingsscreen_lblerrormessage, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_settingsscreen_txtapikey = lv_textarea_create(ui_settingsscreen);
-    lv_obj_set_width(ui_settingsscreen_txtapikey, 480);
-    lv_obj_set_height(ui_settingsscreen_txtapikey, LV_SIZE_CONTENT);    /// 70
-    lv_obj_set_x(ui_settingsscreen_txtapikey, 60);
-    lv_obj_set_y(ui_settingsscreen_txtapikey, 184);
-    lv_textarea_set_placeholder_text(ui_settingsscreen_txtapikey, "API Key");
-    lv_textarea_set_one_line(ui_settingsscreen_txtapikey, true);
-    lv_obj_set_style_text_font(ui_settingsscreen_txtapikey, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-
-
     lv_obj_add_event_cb(ui_settingsscreen_cbxssids, ui_event_settingsscreen_cbxssids, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_settingsscreen_txtpassword, ui_event_settingsscreen_txtpassword, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_settingsscreen_btnwifiscan, ui_event_settingsscreen_btnwifiscan, LV_EVENT_ALL, NULL);
@@ -163,8 +163,8 @@ void ui_settingsscreen_screen_init(void)
     lv_obj_add_event_cb(ui_settingsscreen_btnclose, ui_event_settingsscreen_btnclose, LV_EVENT_ALL, NULL);
     lv_keyboard_set_textarea(ui_settingsscreen_kbdsettings, ui_settingsscreen_txtpassword);
     lv_obj_add_event_cb(ui_settingsscreen_kbdsettings, ui_event_settingsscreen_kbdsettings, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_settingsscreen_txtapikey, ui_event_settingsscreen_txtapikey, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_settingsscreen_lblerrormessage, ui_event_settingsscreen_lblerrormessage, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_settingsscreen_btnerrorack, ui_event_settingsscreen_btnerrorack, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_settingsscreen_txtapikey, ui_event_settingsscreen_txtapikey, LV_EVENT_ALL, NULL);
 
 }

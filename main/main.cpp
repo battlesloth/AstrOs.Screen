@@ -10,11 +10,14 @@
 #include "wifi_controller/wifi_controller.hpp"
 #include "storage/storage_manager.hpp"
 #include "scripts/astros_script.hpp"
+#include "httpclient/astros_http_client.hpp"
+#include "utility/astros_string_util.hpp"
 
 #define TAG "AstrOs Screen"
 #define QUEUE_LENGTH 10
 
 SemaphoreHandle_t xGuiSemaphore;
+bool isWifiConnected = false;
 
 //========== Queues ===========
 static QueueHandle_t uiQueue;
@@ -27,7 +30,6 @@ void wifiTask(void *arg);
 
 //========== Methods ==========
 void setButtonNames();
-void setButtonNameFromString(lv_obj_t *btn, std::string name);
 
 extern "C"
 {
@@ -144,24 +146,16 @@ void wifiTask(void *arg)
       case AstrOsWifiMessageType::CONNECT:
       {
         ESP_LOGI(TAG, "Connecting to wifi network");
-        char ssid[33];
-        std::string pass = "";
 
-        if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
-        {
-          lv_dropdown_get_selected_str(ui_settingsscreen_cbxssids, ssid, 33);
-          auto txt = lv_textarea_get_text(ui_settingsscreen_txtpassword);
+        auto creds = std::string(msg.message);
+        auto split = AstrOsStringUtils::splitString(creds, ':');
 
-          ESP_LOGI(TAG, "PWD: %s", txt);
-
-          pass = txt;
-
-          xSemaphoreGive(xGuiSemaphore);
-        }
+        auto ssid = split[0];
+        auto pass = split[1];
 
         svc_config_t svcConfig;
 
-        memcpy(svcConfig.ssid, ssid, 33);
+        memcpy(svcConfig.ssid, ssid.c_str(), 33);
         svcConfig.ssid[32] = '\0';
 
         auto passLen = pass.length() <= 64 ? pass.length() : 64;
@@ -176,6 +170,18 @@ void wifiTask(void *arg)
       case AstrOsWifiMessageType::DISCONNECT:
         ESP_LOGI(TAG, "Disconnecting from wifi network");
         break;
+      case AstrOsWifiMessageType::SYNC_SCRIPTS:
+      {
+        ESP_LOGI(TAG, "Syncing scripts");
+        httpClient.SendSyncRequest();
+        break;
+      }
+      case AstrOsWifiMessageType::SCRIPT_COMMAND:
+      {
+        ESP_LOGI(TAG, "Sending script command");
+        httpClient.SendScriptCommand(msg.message);
+        break;
+      }
       default:
         ESP_LOGI(TAG, "Unknown message type");
         break;
@@ -234,6 +240,7 @@ void uiUpdateTask(void *arg)
       }
       case AstrOsUiMessageType::WIFI_CONNECTED:
       {
+        isWifiConnected = true;
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
         {
           lv_obj_set_style_bg_color(ui_settingsscreen_btnwificonnect, lv_color_make(143, 206, 0), 0);
@@ -244,6 +251,7 @@ void uiUpdateTask(void *arg)
       }
       case AstrOsUiMessageType::WIFI_DISCONNECTED:
       {
+        isWifiConnected = false;
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
         {
           lv_obj_set_style_bg_color(ui_settingsscreen_btnwificonnect, lv_color_make(184, 28, 28), 0);
@@ -287,6 +295,20 @@ void uiUpdateTask(void *arg)
 }
 
 //========== UI Methods ==========
+void setButtonNameFromString(lv_obj_t *btnLabel, std::string name)
+{
+  if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+  {
+    // lvgl calls free on the value passed so we need to copy it
+    auto len = strlen(name.c_str());
+    char val[len + 1];
+    memcpy(val, name.c_str(), len);
+    val[len] = '\0';
+
+    lv_label_set_text(btnLabel, val);
+    xSemaphoreGive(xGuiSemaphore);
+  }
+}
 
 void setButtonNames()
 {
@@ -301,47 +323,103 @@ void setButtonNames()
   setButtonNameFromString(ui_mainscreen_lblscript9, script.GetScriptName(9));
 }
 
-void setButtonNameFromString(lv_obj_t *btnLabel, std::string name)
-{
-  if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
-  {
-    // lvgl calls free on the value passed so we need to copy it
-    auto len = strlen(name.c_str()) + 1;
-    char val[len];
-    memcpy(val, name.c_str(), len);
-
-    lv_label_set_text(btnLabel, val);
-    xSemaphoreGive(xGuiSemaphore);
-  }
-}
-
-void onScript1(lv_event_t *e)
+void sendNotConnectedMessage()
 {
   astros_ui_message_t msg;
   msg.type = AstrOsUiMessageType::MODAL_MESSAGE;
-
-  std::string id = "script 1";
-
-  msg.message = (char *)malloc(id.size() + 1); // dummy data
-  memccpy(msg.message, id.c_str(), 0, id.size());
-  msg.message[id.size()] = '\0';
+  msg.message = (char *)malloc(24);
+  memcpy(msg.message, "Not connected to wifi", 24);
 
   if (xQueueSend(uiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
   {
     free(msg.message);
   }
 }
-void onScript2(lv_event_t *e) {}
-void onScript3(lv_event_t *e) {}
-void onScript4(lv_event_t *e) {}
-void onScript5(lv_event_t *e) {}
-void onScript6(lv_event_t *e) {}
-void onScript7(lv_event_t *e) {}
-void onScript8(lv_event_t *e) {}
-void onScript9(lv_event_t *e) {}
-void onPanicStop(lv_event_t *e) {}
 
-void onBack(lv_event_t *e) {
+void sendScriptToQueue(std::string scriptId)
+{
+
+  if (!isWifiConnected)
+  {
+    sendNotConnectedMessage();
+    return;
+  }
+
+  if (scriptId.empty() || scriptId == "0")
+  {
+    return;
+  }
+
+  astros_wifi_message_t msg;
+  msg.type = AstrOsWifiMessageType::SCRIPT_COMMAND;
+
+  msg.message = (char *)malloc(scriptId.size() + 1);
+  memcpy(msg.message, scriptId.c_str(), scriptId.size());
+  msg.message[scriptId.size()] = '\0';
+
+  if (xQueueSend(wifiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
+  {
+    free(msg.message);
+  }
+}
+
+void onScript1(lv_event_t *e)
+{
+  sendScriptToQueue(script.GetScriptCommand(1));
+}
+void onScript2(lv_event_t *e)
+{
+  sendScriptToQueue(script.GetScriptCommand(2));
+}
+void onScript3(lv_event_t *e)
+{
+  sendScriptToQueue(script.GetScriptCommand(3));
+}
+void onScript4(lv_event_t *e)
+{
+  sendScriptToQueue(script.GetScriptCommand(4));
+}
+void onScript5(lv_event_t *e)
+{
+  sendScriptToQueue(script.GetScriptCommand(5));
+}
+void onScript6(lv_event_t *e)
+{
+  sendScriptToQueue(script.GetScriptCommand(6));
+}
+void onScript7(lv_event_t *e)
+{
+  sendScriptToQueue(script.GetScriptCommand(7));
+}
+void onScript8(lv_event_t *e)
+{
+  sendScriptToQueue(script.GetScriptCommand(8));
+}
+void onScript9(lv_event_t *e)
+{
+  sendScriptToQueue(script.GetScriptCommand(9));
+}
+void onPanicStop(lv_event_t *e)
+{
+
+  if (!isWifiConnected)
+  {
+    sendNotConnectedMessage();
+    return;
+  }
+
+  astros_wifi_message_t msg;
+  msg.type = AstrOsWifiMessageType::PANIC_STOP;
+  msg.message = nullptr;
+
+  if (xQueueSend(wifiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
+  {
+    free(msg.message);
+  }
+}
+
+void onBack(lv_event_t *e)
+{
   script.DecrementPage();
 
   astros_ui_message_t msg;
@@ -354,7 +432,8 @@ void onBack(lv_event_t *e) {
   }
 }
 
-void onForward(lv_event_t *e) {
+void onForward(lv_event_t *e)
+{
   script.IncrementPage();
 
   astros_ui_message_t msg;
@@ -384,9 +463,19 @@ void onWifiScan(lv_event_t *e)
 
 void onWifiConnect(lv_event_t *e)
 {
+  char ssid[33];
+
+  lv_dropdown_get_selected_str(ui_settingsscreen_cbxssids, ssid, 33);
+  auto pass = lv_textarea_get_text(ui_settingsscreen_txtpassword);
+
+  std::string creds = std::string(ssid) + ":" + pass;
+
   astros_wifi_message_t msg;
   msg.type = AstrOsWifiMessageType::CONNECT;
-  msg.message = nullptr;
+  msg.message = (char *)malloc(creds.size() + 1);
+  memcpy(msg.message, creds.c_str(), creds.size());
+  msg.message[creds.size()] = '\0';
+
   if (xQueueSend(wifiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
   {
     free(msg.message);
@@ -400,7 +489,24 @@ void onApiKeyLostFocus(lv_event_t *e)
   storageManager.saveApiKey(txt);
 }
 
-void onSyncScripts(lv_event_t *e) {}
+void onSyncScripts(lv_event_t *e)
+{
+  if (!isWifiConnected)
+  {
+    sendNotConnectedMessage();
+    return;
+  }
+
+  astros_wifi_message_t msg;
+
+  msg.type = AstrOsWifiMessageType::SYNC_SCRIPTS;
+  msg.message = nullptr;
+
+  if (xQueueSend(wifiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
+  {
+    free(msg.message);
+  }
+}
 
 void onCbxSSIDChanged(lv_event_t *e)
 {

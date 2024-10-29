@@ -4,6 +4,7 @@ FILE(GLOB_RECURSE Utility ${CMAKE_SOURCE_DIR} "utility/*.c")
 FILE(GLOB_RECURSE Storage_c ${CMAKE_SOURCE_DIR} "storage/*.c")
 FILE(GLOB_RECURSE Storage_cpp ${CMAKE_SOURCE_DIR} "storage/*.cpp")
 FILE(GLOB_RECURSE Scripts ${CMAKE_SOURCE_DIR} "scripts/*.cpp")
+FILE(GLOB_RECURSE HttpClient ${CMAKE_SOURCE_DIR} "httpclient/*.cpp")
 
 idf_component_register(SRCS 
     "main.cpp" 
@@ -13,11 +14,13 @@ idf_component_register(SRCS
     ${Storage_c}
     ${Storage_cpp}
     ${Scripts}
+    ${HttpClient}
         INCLUDE_DIRS 
         "." 
         "ui" 
         "wifi_controller" 
         "utility"
         "storage"
-        "scripts")
+        "scripts"
+        "httpclient")
 
