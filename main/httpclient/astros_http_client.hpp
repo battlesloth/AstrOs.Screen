@@ -13,12 +13,12 @@ private:
 public:
     AstrOsHttpClient();
     ~AstrOsHttpClient();
-    void Init(QueueHandle_t queue);
+    void Init(QueueHandle_t queue, char * apiKey);
 
     static QueueHandle_t queue;
 
-    void SetApiKey(std::string apiKey);
-    void SetHost(std::string host);
+    void SetApiKey(char * apiKey);
+    void SetHost(char * host);
 
     void SendSyncRequest();
     void SendScriptCommand(std::string scriptId);

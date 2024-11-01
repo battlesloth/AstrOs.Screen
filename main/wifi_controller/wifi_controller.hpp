@@ -14,6 +14,7 @@ private:
     QueueHandle_t uiUpdateQueue;
     void (*wifiScanCallback)(void);
     int retryCount = 0;
+
 public:
     WifiController(/* args */);
     ~WifiController();
@@ -21,14 +22,13 @@ public:
     void Scan();
     bool Connect(std::string ssid, std::string password);
     void Disconnect();
-    void OnConnected();
+    void OnConnected(char *gateway);
     void OnConnecting();
     void OnDisconnected();
     int GetRetries();
     void IncrementRetries();
 };
 
-
 extern WifiController wifiController;
 
-#endif  //__WIFICONTROLLER_H
+#endif //__WIFICONTROLLER_H

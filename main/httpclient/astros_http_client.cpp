@@ -26,19 +26,20 @@ AstrOsHttpClient::~AstrOsHttpClient()
 {
 }
 
-void AstrOsHttpClient::Init(QueueHandle_t queue)
+void AstrOsHttpClient::Init(QueueHandle_t queue, char *apiKey)
 {
+    this->apiKey = std::string(apiKey);
     AstrOsHttpClient::queue = queue;
 }
 
-void AstrOsHttpClient::SetApiKey(std::string apiKey)
+void AstrOsHttpClient::SetApiKey(char * apiKey)
 {
-    this->apiKey = apiKey;
+    this->apiKey = std::string(apiKey);
 }
 
-void AstrOsHttpClient::SetHost(std::string host)
+void AstrOsHttpClient::SetHost(char * host)
 {
-    this->host = host;
+    this->host = std::string(host);
 }
 
 void AstrOsHttpClient::SendSyncRequest()
@@ -62,7 +63,7 @@ void AstrOsHttpClient::SendSyncRequest()
     
     if (logError(TAG, __func__, __LINE__, err))
     {
-        sendToUiQueue(AstrOsUiMessageType::MODAL_MESSAGE, "Failed to send script command");
+        sendToUiQueue(AstrOsUiMessageType::MODAL_MESSAGE, "Failed to send sync request");
     }
 }
 
@@ -132,7 +133,7 @@ void sendToUiQueue(AstrOsUiMessageType type, char *message)
         msg.message = nullptr;
     }
 
-    if (xQueueSend(AstrOsHttpClient::queue, &msg, pdMS_TO_TICKS(100)) != pdTRUE)
+    if (xQueueSend(AstrOsHttpClient::queue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
     {
         ESP_LOGE(TAG, "Failed to send message to UI update queue");
         free(msg.message);
@@ -204,6 +205,9 @@ esp_err_t httpSyncHandler(esp_http_client_event_t *evt)
         ESP_LOGD(TAG, "HTTP_EVENT_ON_FINISH");
         if (output_buffer != NULL)
         {
+            ESP_LOGI(TAG, "Received %d bytes of data", output_len);
+            output_buffer[output_len] = '\0';
+            ESP_LOGI(TAG, "Received data: %s", output_buffer);
             sendToUiQueue(AstrOsUiMessageType::SCRIPTS_RECEIVED, output_buffer);
             free(output_buffer);
             output_buffer = NULL;

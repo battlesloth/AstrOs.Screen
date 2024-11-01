@@ -28,7 +28,13 @@ void lvglTask(void *arg);
 void uiUpdateTask(void *arg);
 void wifiTask(void *arg);
 
+//========== Timers ==========
+static esp_timer_handle_t uiInitTimer;
+static esp_timer_handle_t clearLoadingScreenTimer;
+
 //========== Methods ==========
+void uiInitCallback(void *arg);
+void clearLoadingScreenCallback(void *arg);
 void setButtonNames();
 
 extern "C"
@@ -77,7 +83,12 @@ void app_main()
     {
       astros_wifi_message_t msg;
       msg.type = AstrOsWifiMessageType::CONNECT;
-      msg.message = nullptr;
+
+      auto creds = std::string(svcConfig.ssid) + ":" + svcConfig.password;
+      msg.message = (char *)malloc(creds.size() + 1);
+      memcpy(msg.message, creds.c_str(), creds.size());
+      msg.message[creds.size()] = '\0';
+
       if (xQueueSend(wifiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
       {
         free(msg.message);
@@ -92,22 +103,69 @@ void app_main()
   if (storageManager.fileExists("scripts.json"))
   {
     auto scriptBlob = storageManager.readFile("scripts.json");
+    ESP_LOGI(TAG, "Scripts file found: %s", scriptBlob.c_str());
     script.LoadScript(scriptBlob);
   }
   else
   {
     ESP_LOGI(TAG, "Scripts file not found");
+    script.DefaultScript();
   }
 
-  setButtonNames();
-
+  httpClient.Init(uiQueue, apiKey);
   wifiController.Init(uiQueue);
 
-  xTaskCreate(&wifiTask, "wifiTask", 4096, (void *)wifiQueue, 9, NULL);
+  xTaskCreate(&wifiTask, "wifiTask", 8192, (void *)wifiQueue, 9, NULL);
   xTaskCreate(&uiUpdateTask, "uiUpdateTask", 4096, (void *)uiQueue, 8, NULL);
   xTaskCreate(&lvglTask, "lvglTask", 4096, NULL, 10, NULL);
+
+  const esp_timer_create_args_t uiInitTimerArgs = {
+      .callback = &uiInitCallback,
+      .arg = NULL,
+      .dispatch_method = ESP_TIMER_TASK,
+      .name = "delay_ui_update"};
+
+  ESP_ERROR_CHECK(esp_timer_create(&uiInitTimerArgs, &uiInitTimer));
+  ESP_ERROR_CHECK(esp_timer_start_once(uiInitTimer, 5 * 1000));
 }
 
+//========== Callbacks ==========
+
+void uiInitCallback(void *arg)
+{
+  ESP_LOGI(TAG, "UI Init Callback");
+  astros_ui_message_t msg;
+  msg.type = AstrOsUiMessageType::UPDATE_BUTTON_NAMES;
+  msg.message = nullptr;
+
+  if (xQueueSend(uiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
+  {
+    free(msg.message);
+  }
+
+  const esp_timer_create_args_t clearLoadingScreenTimerArgs = {
+      .callback = &clearLoadingScreenCallback,
+      .arg = NULL,
+      .dispatch_method = ESP_TIMER_TASK,
+      .name = "clear_loading_screen"};
+
+  ESP_ERROR_CHECK(esp_timer_create(&clearLoadingScreenTimerArgs, &clearLoadingScreenTimer));
+  ESP_ERROR_CHECK(esp_timer_start_once(clearLoadingScreenTimer, 3 * 1000 * 1000));
+}
+
+void clearLoadingScreenCallback(void *arg)
+{
+  astros_ui_message_t msg;
+  msg.type = AstrOsUiMessageType::CLEAR_LOADING_SCREEN;
+  msg.message = nullptr;
+
+  if (xQueueSend(uiQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
+  {
+    free(msg.message);
+  }
+}
+
+//========== Tasks ==========
 void lvglTask(void *arg)
 {
   while (1)
@@ -196,6 +254,7 @@ void uiUpdateTask(void *arg)
 {
   auto queue = (QueueHandle_t)arg;
   astros_ui_message_t msg;
+
   while (1)
   {
     if (xQueueReceive(queue, &msg, pdMS_TO_TICKS(500)) == pdTRUE)
@@ -209,6 +268,15 @@ void uiUpdateTask(void *arg)
       ESP_LOGI(TAG, "Received message: %d", (int)msg.type);
       switch (msg.type)
       {
+      case AstrOsUiMessageType::CLEAR_LOADING_SCREEN:
+      {
+        if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+        {
+          lv_scr_load_anim(ui_mainscreen, LV_SCR_LOAD_ANIM_FADE_OUT, 500, 0, true);
+          xSemaphoreGive(xGuiSemaphore);
+        }
+        break;
+      }
       case AstrOsUiMessageType::WIFI_SCAN_COMPLETED:
       {
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
@@ -240,9 +308,10 @@ void uiUpdateTask(void *arg)
       }
       case AstrOsUiMessageType::WIFI_CONNECTED:
       {
-        isWifiConnected = true;
+        httpClient.SetHost(msg.message);
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
         {
+          isWifiConnected = true;
           lv_obj_set_style_bg_color(ui_settingsscreen_btnwificonnect, lv_color_make(143, 206, 0), 0);
           lv_obj_set_style_bg_color(ui_mainscreen_btnwifi, lv_color_make(143, 206, 0), 0);
           xSemaphoreGive(xGuiSemaphore);
@@ -251,9 +320,9 @@ void uiUpdateTask(void *arg)
       }
       case AstrOsUiMessageType::WIFI_DISCONNECTED:
       {
-        isWifiConnected = false;
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
         {
+          isWifiConnected = false;
           lv_obj_set_style_bg_color(ui_settingsscreen_btnwificonnect, lv_color_make(184, 28, 28), 0);
           lv_obj_set_style_bg_color(ui_mainscreen_btnwifi, lv_color_make(184, 28, 28), 0);
           xSemaphoreGive(xGuiSemaphore);
@@ -281,6 +350,12 @@ void uiUpdateTask(void *arg)
       }
       case AstrOsUiMessageType::UPDATE_BUTTON_NAMES:
       {
+        setButtonNames();
+        break;
+      }
+      case AstrOsUiMessageType::SCRIPTS_RECEIVED:
+      {
+        script.LoadScript(msg.message);
         setButtonNames();
         break;
       }
@@ -489,6 +564,18 @@ void onApiKeyLostFocus(lv_event_t *e)
   storageManager.saveApiKey(txt);
 }
 
+void onIpKeyLostFocus(lv_event_t *e)
+{
+}
+
+void onUseGatewayChecked(lv_event_t *e)
+{
+}
+
+void onUseGatewayUnchecked(lv_event_t *e)
+{
+}
+
 void onSyncScripts(lv_event_t *e)
 {
   if (!isWifiConnected)
@@ -510,7 +597,7 @@ void onSyncScripts(lv_event_t *e)
 
 void onCbxSSIDChanged(lv_event_t *e)
 {
-  auto *cbx = lv_event_get_target(e);
+  auto cbx = lv_event_get_target(e);
   lv_dropdown_set_text(cbx, NULL);
 }
 
@@ -534,6 +621,11 @@ void onKbdPressed(lv_event_t *e)
     lv_obj_clear_state(ui_settingsscreen_txtpassword, LV_STATE_FOCUSED);
     lv_obj_add_flag(kbd, LV_OBJ_FLAG_HIDDEN);
   }
+}
+
+void onSettingsClosed(lv_event_t *e)
+{
+  
 }
 
 void onErrorAck(lv_event_t *e)

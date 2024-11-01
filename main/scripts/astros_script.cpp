@@ -5,7 +5,8 @@ AstrosScript script;
 
 AstrosScript::AstrosScript()
 {
-    AstrosScript::defaultScript();
+    page = 0;
+    scripts = std::vector<std::vector<script_cmd_t>>();
 }
 
 AstrosScript::~AstrosScript() {}
@@ -51,7 +52,7 @@ void AstrosScript::LoadScript(std::string blob)
 
     if (scripts.size() < 1)
     {
-        AstrosScript::defaultScript();
+        AstrosScript::DefaultScript();
     }
 
     page = 0;
@@ -112,26 +113,16 @@ std::string AstrosScript::GetScriptCommand(int button)
     return scripts[page][val].command;
 }
 
-void AstrosScript::defaultScript()
+void AstrosScript::DefaultScript()
 {
     scripts.clear();
 
     std::vector<script_cmd_t> emptyPage = {
-        {"None", "0"}, {"None", "0"}, {"None", "0"}, 
+        {"test 1", "test"}, {"test 2", "0"}, {"None", "0"}, 
         {"None", "0"}, {"None", "0"}, {"None", "0"}, 
         {"None", "0"}, {"None", "0"}, {"None", "0"}
     };
 
     scripts.push_back(emptyPage);
-
-    std::vector<script_cmd_t> page2 = {
-        {"Page2", "0"}, {"Page2", "0"}, {"Page2", "0"}, {"Page2", "0"}, {"Page2", "0"}, {"Page2", "0"}, {"Page2", "0"}, {"Page2", "0"}, {"Page2", "0"}};
-
-    scripts.push_back(page2);
-    std::vector<script_cmd_t> page3 = {
-        {"Page3", "0"}, {"Page3", "0"}, {"Page3", "0"}, {"Page3", "0"}, {"Page3", "0"}, {"Page3", "0"}, {"Page3", "0"}, {"Page3", "0"}, {"Page3", "0"}};
-
-    scripts.push_back(page3);
-
     page = 0;
 }

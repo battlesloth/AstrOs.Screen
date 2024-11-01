@@ -9,6 +9,15 @@
 ///////////////////// VARIABLES ////////////////////
 
 
+// SCREEN: ui_loadingscreen
+void ui_loadingscreen_screen_init(void);
+lv_obj_t * ui_loadingscreen;
+lv_obj_t * ui_loadingscreen_spinner1;
+lv_obj_t * ui_loadingscreen_label1;
+lv_obj_t * ui_loadingscreen_label2;
+lv_obj_t * ui_loadingscreen_label3;
+
+
 // SCREEN: ui_mainscreen
 void ui_mainscreen_screen_init(void);
 lv_obj_t * ui_mainscreen;
@@ -79,10 +88,14 @@ lv_obj_t * ui_settingsscreen_lblsync;
 void ui_event_settingsscreen_btnclose(lv_event_t * e);
 lv_obj_t * ui_settingsscreen_btnclose;
 lv_obj_t * ui_settingsscreen_lblclose;
-void ui_event_settingsscreen_kbdsettings(lv_event_t * e);
-lv_obj_t * ui_settingsscreen_kbdsettings;
 void ui_event_settingsscreen_txtapikey(lv_event_t * e);
 lv_obj_t * ui_settingsscreen_txtapikey;
+void ui_event_settingsscreen_txtserverip(lv_event_t * e);
+lv_obj_t * ui_settingsscreen_txtserverip;
+void ui_event_settingsscreen_chkusegateway(lv_event_t * e);
+lv_obj_t * ui_settingsscreen_chkusegateway;
+void ui_event_settingsscreen_kbdsettings(lv_event_t * e);
+lv_obj_t * ui_settingsscreen_kbdsettings;
 lv_obj_t * ui_settingsscreen_settingserrormodal;
 lv_obj_t * ui_settingsscreen_coverpanel2;
 void ui_event_settingsscreen_btnerrorack(lv_event_t * e);
@@ -263,14 +276,7 @@ void ui_event_settingsscreen_btnclose(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_mainscreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 500, 0, &ui_mainscreen_screen_init);
-    }
-}
-void ui_event_settingsscreen_kbdsettings(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_VALUE_CHANGED) {
-        onKbdPressed(e);
+        onSettingsClosed(e);
     }
 }
 void ui_event_settingsscreen_txtapikey(lv_event_t * e)
@@ -285,6 +291,41 @@ void ui_event_settingsscreen_txtapikey(lv_event_t * e)
     }
     if(event_code == LV_EVENT_DEFOCUSED) {
         onApiKeyLostFocus(e);
+    }
+}
+void ui_event_settingsscreen_txtserverip(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_FOCUSED) {
+        _ui_keyboard_set_target(ui_settingsscreen_kbdsettings,  ui_settingsscreen_txtserverip);
+    }
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_flag_modify(ui_settingsscreen_kbdsettings, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+    }
+    if(event_code == LV_EVENT_DEFOCUSED) {
+        onIpKeyLostFocus(e);
+    }
+}
+void ui_event_settingsscreen_chkusegateway(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED &&  lv_obj_has_state(target, LV_STATE_CHECKED)) {
+        _ui_state_modify(ui_settingsscreen_txtserverip, LV_STATE_DISABLED, _UI_MODIFY_STATE_REMOVE);
+        onUseGatewayChecked(e);
+    }
+    if(event_code == LV_EVENT_VALUE_CHANGED &&  !lv_obj_has_state(target, LV_STATE_CHECKED)) {
+        _ui_state_modify(ui_settingsscreen_txtserverip, LV_STATE_DISABLED, _UI_MODIFY_STATE_ADD);
+        onUseGatewayUnchecked(e);
+    }
+}
+void ui_event_settingsscreen_kbdsettings(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        onKbdPressed(e);
     }
 }
 void ui_event_settingsscreen_btnerrorack(lv_event_t * e)
@@ -312,8 +353,9 @@ void ui_init(void)
     lv_theme_t * theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
                                                true, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
+    ui_loadingscreen_screen_init();
     ui_mainscreen_screen_init();
     ui_settingsscreen_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
-    lv_disp_load_scr(ui_mainscreen);
+    lv_disp_load_scr(ui_loadingscreen);
 }

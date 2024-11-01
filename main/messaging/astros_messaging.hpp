@@ -3,6 +3,7 @@
 
 enum class AstrOsUiMessageType {
     UNKNOWN,
+    CLEAR_LOADING_SCREEN,
     SSID_DETECTED,
     WIFI_SCAN_COMPLETED,
     WIFI_CONNECTING,

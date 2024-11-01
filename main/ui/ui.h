@@ -25,6 +25,13 @@ extern "C" {
 #include "ui_helpers.h"
 #include "ui_events.h"
 
+// SCREEN: ui_loadingscreen
+void ui_loadingscreen_screen_init(void);
+extern lv_obj_t * ui_loadingscreen;
+extern lv_obj_t * ui_loadingscreen_spinner1;
+extern lv_obj_t * ui_loadingscreen_label1;
+extern lv_obj_t * ui_loadingscreen_label2;
+extern lv_obj_t * ui_loadingscreen_label3;
 // SCREEN: ui_mainscreen
 void ui_mainscreen_screen_init(void);
 extern lv_obj_t * ui_mainscreen;
@@ -93,10 +100,14 @@ extern lv_obj_t * ui_settingsscreen_lblsync;
 void ui_event_settingsscreen_btnclose(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_btnclose;
 extern lv_obj_t * ui_settingsscreen_lblclose;
-void ui_event_settingsscreen_kbdsettings(lv_event_t * e);
-extern lv_obj_t * ui_settingsscreen_kbdsettings;
 void ui_event_settingsscreen_txtapikey(lv_event_t * e);
 extern lv_obj_t * ui_settingsscreen_txtapikey;
+void ui_event_settingsscreen_txtserverip(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_txtserverip;
+void ui_event_settingsscreen_chkusegateway(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_chkusegateway;
+void ui_event_settingsscreen_kbdsettings(lv_event_t * e);
+extern lv_obj_t * ui_settingsscreen_kbdsettings;
 extern lv_obj_t * ui_settingsscreen_settingserrormodal;
 extern lv_obj_t * ui_settingsscreen_coverpanel2;
 void ui_event_settingsscreen_btnerrorack(lv_event_t * e);
@@ -112,6 +123,7 @@ LV_IMG_DECLARE(ui_img_gear_png);    // assets/gear.png
 
 
 LV_FONT_DECLARE(ui_font_StarJedi_28);
+LV_FONT_DECLARE(ui_font_StarJedi_72);
 
 
 

@@ -14,12 +14,12 @@ struct script_cmd_t
 class AstrosScript
 {
     private:
-        void defaultScript();
         std::vector<std::vector<script_cmd_t>> scripts;
         int page;
     public:
         AstrosScript();
         ~AstrosScript();
+        void DefaultScript();
         void LoadScript(std::string blob);
         void IncrementPage();
         void DecrementPage();

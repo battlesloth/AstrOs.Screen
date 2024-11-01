@@ -1,4 +1,6 @@
 #include "wifi_controller.hpp"
+#include <esp_wifi.h>
+#include <esp_netif.h>
 
 #include <messaging/astros_messaging.hpp>
 #include <esp_log.h>
@@ -7,6 +9,7 @@
 
 #define TAG "AstrOs Wifi Controller"
 static bool intentionalDisconnect = false;
+static bool connected = false;
 
 #define DEFAULT_SCAN_LIST_SIZE 20
 
@@ -28,17 +31,20 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
         case WIFI_EVENT_STA_CONNECTED:
         {
             ESP_LOGI(TAG, "WIFI_EVENT_STA_CONNECTED");
+            connected = true;
             break;
         }
         case WIFI_EVENT_STA_DISCONNECTED:
         {
             wifi_event_sta_disconnected_t *event = (wifi_event_sta_disconnected_t *)event_data;
             ESP_LOGI(TAG, "WIFI STA disconnected, Reason:%d.", event->reason);
-            
+            connected = false;
             if (intentionalDisconnect)
             {
                 ESP_LOGI(TAG, "WIFI_EVENT_STA_DISCONNECTED - intentional disconnect");
                 intentionalDisconnect = false;
+                wifiController.OnDisconnected();
+                return;
             }
             else if (wifiController.GetRetries() < 5)
             {
@@ -51,6 +57,7 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
             {
                 ESP_LOGE(TAG, "Failed to connect to wifi network");
                 wifiController.OnDisconnected();
+                return;
             }
             break;
         }
@@ -65,7 +72,10 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
         case IP_EVENT_STA_GOT_IP:
         {
             ESP_LOGI(TAG, "IP_EVENT_STA_GOT_IP");
-            wifiController.OnConnected();
+            esp_netif_ip_info_t ipInfo;
+            esp_netif_get_ip_info(esp_netif_get_default_netif(), &ipInfo);
+            char ipStr[IP4ADDR_STRLEN_MAX];
+            wifiController.OnConnected(esp_ip4addr_ntoa(&ipInfo.gw, ipStr, IP4ADDR_STRLEN_MAX));
             break;
         }
         default:
@@ -103,6 +113,10 @@ void WifiController::Init(QueueHandle_t queue)
 void WifiController::Scan()
 {
     ESP_LOGI(TAG, "Scanning for wifi networks");
+    if (connected)
+    {
+        this->Disconnect();
+    }
 
     uint16_t number = DEFAULT_SCAN_LIST_SIZE;
     wifi_ap_record_t ap_info[DEFAULT_SCAN_LIST_SIZE];
@@ -130,7 +144,7 @@ void WifiController::Scan()
         msg.message = (char *)malloc(ssidSize);
         memcpy(msg.message, (char *)ap_info[i].ssid, ssidSize);
 
-        if (xQueueSend(this->uiUpdateQueue, &msg, pdMS_TO_TICKS(100)) != pdTRUE)
+        if (xQueueSend(this->uiUpdateQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
         {
             ESP_LOGE(TAG, "Failed to send message to UI update queue");
             free(msg.message);
@@ -140,7 +154,7 @@ void WifiController::Scan()
     astros_ui_message_t msg;
     msg.type = AstrOsUiMessageType::WIFI_SCAN_COMPLETED;
     msg.message = nullptr;
-    if (xQueueSend(this->uiUpdateQueue, &msg, pdMS_TO_TICKS(100)) != pdTRUE)
+    if (xQueueSend(this->uiUpdateQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
     {
         ESP_LOGE(TAG, "Failed to send message to UI update queue");
     }
@@ -150,6 +164,11 @@ bool WifiController::Connect(std::string ssid, std::string password)
 {
     ESP_LOGI(TAG, "Connecting to wifi network %s, pwd_len:%d", ssid.c_str(), password.length());
 
+    if (connected)
+    {
+        this->Disconnect();
+    }
+    
     this->retryCount = 0;
     error_t err = ESP_OK;
 
@@ -208,18 +227,23 @@ void WifiController::OnConnecting()
     astros_ui_message_t msg;
     msg.type = AstrOsUiMessageType::WIFI_CONNECTING;
     msg.message = nullptr;
-    if (xQueueSend(this->uiUpdateQueue, &msg, pdMS_TO_TICKS(100)) != pdTRUE)
+    if (xQueueSend(this->uiUpdateQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
     {
         ESP_LOGE(TAG, "Failed to send message to UI update queue");
     }
 }
 
-void WifiController::OnConnected()
+void WifiController::OnConnected(char *gateway)
 {
     astros_ui_message_t msg;
     msg.type = AstrOsUiMessageType::WIFI_CONNECTED;
-    msg.message = nullptr;
-    if (xQueueSend(this->uiUpdateQueue, &msg, pdMS_TO_TICKS(100)) != pdTRUE)
+   
+    auto len = strlen(gateway);
+    msg.message = (char *)malloc(len + 1);
+    memcpy(msg.message, gateway, len);
+    msg.message[len] = '\0';
+   
+    if (xQueueSend(this->uiUpdateQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
     {
         ESP_LOGE(TAG, "Failed to send message to UI update queue");
     }
@@ -230,7 +254,7 @@ void WifiController::OnDisconnected()
     astros_ui_message_t msg;
     msg.type = AstrOsUiMessageType::WIFI_DISCONNECTED;
     msg.message = nullptr;
-    if (xQueueSend(this->uiUpdateQueue, &msg, pdMS_TO_TICKS(100)) != pdTRUE)
+    if (xQueueSend(this->uiUpdateQueue, &msg, pdMS_TO_TICKS(500)) != pdTRUE)
     {
         ESP_LOGE(TAG, "Failed to send message to UI update queue");
     }
