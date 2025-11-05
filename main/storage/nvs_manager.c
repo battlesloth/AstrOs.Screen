@@ -4,10 +4,26 @@
 #include <nvs_flash.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 
 #include "../utility/astros_util.h"
 
 static const char *TAG = "NvsManager";
+
+// Helper function to clean strings by removing non-printable characters
+static void cleanString(char *str) {
+    char *src = str;
+    char *dst = str;
+    
+    while (*src) {
+        if (isprint((unsigned char)*src) && *src != '\t' && *src != '\n' && *src != '\r') {
+            *dst = *src;
+            dst++;
+        }
+        src++;
+    }
+    *dst = '\0';
+}
 
 bool nvsSaveServiceConfig(svc_config_t config)
 {
@@ -37,14 +53,6 @@ bool nvsSaveServiceConfig(svc_config_t config)
         return false;
     }
 
-
-    err = nvs_set_str(nvsHandle, "ip", config.password);
-    if (logError(TAG, __FUNCTION__, __LINE__, err))
-    {
-        nvs_close(nvsHandle);
-        return false;
-    }
-    
     nvs_close(nvsHandle);
 
     return true;
@@ -68,26 +76,26 @@ bool nvsLoadServiceConfig(svc_config_t *config)
     err = nvs_get_str(nvsHandle, "ssid", config->ssid, &defaultSize);
     if (logError(TAG, __FUNCTION__, __LINE__, err))
     {
-        memset(config->ssid, "error\0", 6);
+        strcpy(config->ssid, "error");
         result = false;
+    }
+    else
+    {
+        // Clean the SSID by removing non-printable characters
+        cleanString(config->ssid);
     }
 
     defaultSize = 65;
     err = nvs_get_str(nvsHandle, "password", config->password, &defaultSize);
     if (logError(TAG, __FUNCTION__, __LINE__, err))
     {
-        memset(config->ssid, "error\0", 6);
+        strcpy(config->ssid, "error");
         result = false;
     }
-
-    defaultSize = 16;
-    err = nvs_get_str(nvsHandle, "ip", config->ip, &defaultSize);
-    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    else
     {
-        // IP can be blank since by default we assume the
-        // connection is direct to the device and not through
-        // a network
-        memcpy(config->ip, "\0", 6);
+        // Clean the password by removing non-printable characters
+        cleanString(config->password);
     }
 
     nvs_close(nvsHandle);
@@ -114,7 +122,10 @@ bool nvsClearServiceConfig()
     err = nvs_erase_key(nvsHandle, "password");
     logError(TAG, __FUNCTION__, __LINE__, err);
 
-    err = nvs_erase_key(nvsHandle, "ip");
+    err = nvs_erase_key(nvsHandle, "host");
+    logError(TAG, __FUNCTION__, __LINE__, err);
+
+    err = nvs_erase_key(nvsHandle, "useGateway");
     logError(TAG, __FUNCTION__, __LINE__, err);
 
     err = nvs_commit(nvsHandle);
@@ -170,7 +181,35 @@ bool nvsLoadApiKey(char *apiKey)
     err = nvs_get_str(nvsHandle, "apikey", apiKey, &defaultSize);
     if (logError(TAG, __FUNCTION__, __LINE__, err))
     {
-        memset(apiKey, "error\0", 6);
+        strcpy(apiKey, "error");
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    // Clean the API key by removing non-printable characters
+    cleanString(apiKey);
+
+    nvs_close(nvsHandle);
+
+    return true;
+}
+
+bool nvsSaveHost(const char *host)
+{
+    esp_err_t err;
+    nvs_handle_t nvsHandle;
+
+    err = nvs_open("config", NVS_READWRITE, &nvsHandle);
+
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    err = nvs_set_str(nvsHandle, "host", host);
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
         nvs_close(nvsHandle);
         return false;
     }
@@ -178,4 +217,82 @@ bool nvsLoadApiKey(char *apiKey)
     nvs_close(nvsHandle);
 
     return true;
+}
+
+bool nvsLoadHost(char *host)
+{
+    esp_err_t err;
+    nvs_handle_t nvsHandle;
+    size_t defaultSize = 16;
+
+    err = nvs_open("config", NVS_READWRITE, &nvsHandle);
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    err = nvs_get_str(nvsHandle, "host", host, &defaultSize);
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        strcpy(host, "\0");
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    // Clean the host string by removing non-printable characters
+    cleanString(host);
+
+    nvs_close(nvsHandle);
+
+    return true;
+}
+
+bool nvsSaveUseGateway(bool useGateway)
+{
+    esp_err_t err;
+    nvs_handle_t nvsHandle;
+
+    err = nvs_open("config", NVS_READWRITE, &nvsHandle);
+
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    err = nvs_set_u8(nvsHandle, "useGateway", useGateway);
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    nvs_close(nvsHandle);
+
+    return true;
+}
+
+bool nvsLoadUseGateway()
+{
+    esp_err_t err;
+    nvs_handle_t nvsHandle;
+    uint8_t value = 0;
+
+    err = nvs_open("config", NVS_READWRITE, &nvsHandle);
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        nvs_close(nvsHandle);
+        return false;
+    }
+
+    err = nvs_get_u8(nvsHandle, "useGateway", &value);
+    if (logError(TAG, __FUNCTION__, __LINE__, err))
+    {
+        nvs_close(nvsHandle);
+        return false;
+    }
+    nvs_close(nvsHandle);
+
+    return value > 0;
 }

@@ -9,7 +9,10 @@ class AstrOsHttpClient
 {
 private:
     std::string apiKey;
+    std::string gateway;
     std::string host;
+    bool useHost;
+    std::string getDestination();
 public:
     AstrOsHttpClient();
     ~AstrOsHttpClient();
@@ -17,8 +20,10 @@ public:
 
     static QueueHandle_t queue;
 
-    void SetApiKey(char * apiKey);
-    void SetHost(char * host);
+    void SetApiKey(const char * apiKey);
+    void SetGateway(const char * host);
+    void SetHost(const char * host);
+    void SetUseHost(bool useHost);
 
     void SendSyncRequest();
     void SendScriptCommand(std::string scriptId);

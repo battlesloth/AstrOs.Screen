@@ -12,7 +12,6 @@ extern "C"
     {
         char ssid[33];
         char password[65];
-        char ip[16];
     } svc_config_t;
 
     // save the service configuration to NVS
@@ -29,6 +28,18 @@ extern "C"
 
     // load api key from NVS
     bool nvsLoadApiKey(char *apiKey);
+
+    // save host to NVS
+    bool nvsSaveHost(const char *host);
+
+    // load host from NVS
+    bool nvsLoadHost(char *host);
+
+    // save use gateway to NVS
+    bool nvsSaveUseGateway(bool useGateway);
+
+    // load use gateway from NVS
+    bool nvsLoadUseGateway();
 
 #ifdef __cplusplus
 }

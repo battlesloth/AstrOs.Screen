@@ -1,19 +1,22 @@
 #include "astros_script.hpp"
 #include "cJSON.h"
+#include <esp_log.h>
 
 AstrosScript script;
 
 AstrosScript::AstrosScript()
 {
     page = 0;
-    scripts = std::vector<std::vector<script_cmd_t>>();
+    this->scripts = std::vector<std::vector<script_cmd_t>>();
 }
 
 AstrosScript::~AstrosScript() {}
 
 void AstrosScript::LoadScript(std::string blob)
 {
-    scripts.clear();
+    this->scripts.clear();
+
+    ESP_LOGI("AstrosScript", "Loading script: %s", blob.c_str());
 
     cJSON *root = cJSON_Parse(blob.c_str());
 
@@ -25,7 +28,6 @@ void AstrosScript::LoadScript(std::string blob)
 
     cJSON_ArrayForEach(page, pages)
     {
-
         std::vector<script_cmd_t> buttonPage;
 
         cJSON_ArrayForEach(button, page)
@@ -45,34 +47,35 @@ void AstrosScript::LoadScript(std::string blob)
             }
         }
 
-        scripts.push_back(buttonPage);
+        this->scripts.push_back(buttonPage);
     }
 
     cJSON_Delete(root);
 
-    if (scripts.size() < 1)
+    if (this->scripts.size() < 1)
     {
+        ESP_LOGW("AstrosScript", "No scripts found, loading default script");
         AstrosScript::DefaultScript();
     }
 
-    page = 0;
+    this->page = 0;
 }
 
 void AstrosScript::IncrementPage()
 {
-    page++;
-    if (page >= scripts.size())
+    this->page++;
+    if (this->page >= scripts.size())
     {
-        page = 0;
+        this->page = 0;
     }
 }
 
 void AstrosScript::DecrementPage()
 {
-    page--;
-    if (page < 0)
+    this->page--;
+    if (this->page < 0)
     {
-        page = scripts.size() - 1;
+        this->page = scripts.size() - 1;
     }
 }
 
@@ -85,32 +88,32 @@ std::string AstrosScript::GetScriptName(int button)
 {
     auto val = button - 1;
 
-    if (scripts[page].size() > button)
+    if (scripts[this->page].size() < button)
     {
-        val = scripts[page].size() - 1;
+        return "error";
     }
     else if (val < 0)
     {
-        val = 0;
+        return "error";
     }
 
-    return scripts[page][val].name;
+    return scripts[this->page][val].name;
 }
 
 std::string AstrosScript::GetScriptCommand(int button)
 {
     auto val = button - 1;
 
-    if (scripts[page].size() > button)
+    if (scripts[this->page].size() < button)
     {
-        val = scripts[page].size() - 1;
+        return "error";
     }
     else if (val < 0)
     {
-        val = 0;
+        return "error";
     }
 
-    return scripts[page][val].command;
+    return scripts[this->page][val].command;
 }
 
 void AstrosScript::DefaultScript()
@@ -118,11 +121,11 @@ void AstrosScript::DefaultScript()
     scripts.clear();
 
     std::vector<script_cmd_t> emptyPage = {
-        {"test 1", "test"}, {"test 2", "0"}, {"None", "0"}, 
+        {"None", "0"}, {"None", "0"}, {"None", "0"}, 
         {"None", "0"}, {"None", "0"}, {"None", "0"}, 
         {"None", "0"}, {"None", "0"}, {"None", "0"}
     };
 
     scripts.push_back(emptyPage);
-    page = 0;
+    this->page = 0;
 }

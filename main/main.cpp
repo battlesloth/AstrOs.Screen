@@ -18,6 +18,7 @@
 
 SemaphoreHandle_t xGuiSemaphore;
 bool isWifiConnected = false;
+bool sdCardMounted = false;
 
 //========== Queues ===========
 static QueueHandle_t uiQueue;
@@ -44,30 +45,21 @@ extern "C"
 
 void app_main()
 {
+  // start screen
+  WZ8048C050_Init();
+  ui_init();
+  lv_timer_handler();
+
   xGuiSemaphore = xSemaphoreCreateMutex();
   wifiQueue = xQueueCreate(QUEUE_LENGTH, sizeof(astros_wifi_message_t));
   uiQueue = xQueueCreate(QUEUE_LENGTH, sizeof(astros_ui_message_t));
 
   ESP_ERROR_CHECK(storageManager.Init());
 
+  // Load WIFI creds
   svc_config_t svcConfig;
-  auto cfigLoaded(storageManager.loadServiceConfig(&svcConfig));
 
-  // load api key, if it exists, else create empty string
-  char apiKey[65] = "";
-  storageManager.loadApiKey(apiKey);
-
-  WZ8048C050_Init();
-  ui_init();
-  lv_timer_handler();
-
-  if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
-  {
-    lv_textarea_set_text(ui_settingsscreen_txtapikey, apiKey);
-    xSemaphoreGive(xGuiSemaphore);
-  }
-
-  if (cfigLoaded)
+  if (storageManager.loadServiceConfig(&svcConfig))
   {
     ESP_LOGI(TAG, "Service Config Loaded");
     if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
@@ -98,6 +90,53 @@ void app_main()
   else
   {
     ESP_LOGI(TAG, "Service Config Not Loaded");
+  }
+
+  // load api key
+  char apiKey[65] = "";
+  if (storageManager.loadApiKey(apiKey))
+  {
+    httpClient.SetApiKey(apiKey);
+
+    if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+    {
+      lv_textarea_set_text(ui_settingsscreen_txtapikey, apiKey);
+      xSemaphoreGive(xGuiSemaphore);
+    }
+  }
+
+  // load use gateway
+  if (storageManager.loadUseGateway())
+  {
+    httpClient.SetUseHost(true);
+    if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+    {
+      lv_obj_add_state(ui_settingsscreen_chkusegateway, LV_STATE_CHECKED);
+      lv_obj_clear_state(ui_settingsscreen_txtserverip, LV_STATE_DISABLED);
+      xSemaphoreGive(xGuiSemaphore);
+    }
+  }
+  else
+  {
+    httpClient.SetUseHost(false);
+    if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+    {
+      lv_obj_clear_state(ui_settingsscreen_chkusegateway, LV_STATE_CHECKED);
+      lv_obj_add_state(ui_settingsscreen_txtserverip, LV_STATE_DISABLED);
+      xSemaphoreGive(xGuiSemaphore);
+    }
+  }
+
+  // load host
+  char host[16] = "";
+  if (storageManager.loadHost(host))
+  {
+    httpClient.SetHost(host);
+    if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+    {
+      lv_textarea_set_text(ui_settingsscreen_txtserverip, host);
+      xSemaphoreGive(xGuiSemaphore);
+    }
   }
 
   if (storageManager.fileExists("scripts.json"))
@@ -195,7 +234,7 @@ void wifiTask(void *arg)
         ESP_LOGW(TAG, "Wifi Task Stack HWM: %d", highWaterMark);
       }
 
-      ESP_LOGI(TAG, "Received message: %d", (int)msg.type);
+      ESP_LOGI(TAG, "Received wifi message: %d", (int)msg.type);
       switch (msg.type)
       {
       case AstrOsWifiMessageType::SCAN_START:
@@ -240,6 +279,12 @@ void wifiTask(void *arg)
         httpClient.SendScriptCommand(msg.message);
         break;
       }
+      case AstrOsWifiMessageType::PANIC_STOP:
+      {
+        ESP_LOGI(TAG, "Sending panic stop");
+        httpClient.SendPanicStop();
+        break;
+      }
       default:
         ESP_LOGI(TAG, "Unknown message type");
         break;
@@ -265,15 +310,37 @@ void uiUpdateTask(void *arg)
         ESP_LOGW(TAG, "UI Update Task Stack HWM: %d", highWaterMark);
       }
 
-      ESP_LOGI(TAG, "Received message: %d", (int)msg.type);
+      ESP_LOGI(TAG, "Received UI message: %d", (int)msg.type);
       switch (msg.type)
       {
       case AstrOsUiMessageType::CLEAR_LOADING_SCREEN:
       {
+
+        auto sdCardMounted = storageManager.validateSdCard();
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
         {
           lv_scr_load_anim(ui_mainscreen, LV_SCR_LOAD_ANIM_FADE_OUT, 500, 0, true);
           xSemaphoreGive(xGuiSemaphore);
+        }
+
+        if (sdCardMounted)
+        {
+          ESP_LOGI(TAG, "SD Card mounted successfully");
+        }
+        else
+        {
+          ESP_LOGI(TAG, "No SD Card detected");
+          // pop modal message
+          if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+          {
+            lv_label_set_text(ui_settingsscreen_lblerrormessage, "SD Card error");
+            lv_obj_clear_flag(ui_settingsscreen_settingserrormodal, LV_OBJ_FLAG_HIDDEN);
+
+            lv_label_set_text(ui_mainscreen_lblerrormessage, "SD Card error");
+            lv_obj_clear_flag(ui_mainscreen_mainerrormodal, LV_OBJ_FLAG_HIDDEN);
+
+            xSemaphoreGive(xGuiSemaphore);
+          }
         }
         break;
       }
@@ -308,7 +375,7 @@ void uiUpdateTask(void *arg)
       }
       case AstrOsUiMessageType::WIFI_CONNECTED:
       {
-        httpClient.SetHost(msg.message);
+        httpClient.SetGateway(msg.message);
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
         {
           isWifiConnected = true;
@@ -355,8 +422,24 @@ void uiUpdateTask(void *arg)
       }
       case AstrOsUiMessageType::SCRIPTS_RECEIVED:
       {
-        script.LoadScript(msg.message);
-        setButtonNames();
+        if (storageManager.saveFile("scripts.json", msg.message))
+        {
+          script.LoadScript(msg.message);
+          setButtonNames();
+        }
+        else
+        {
+          if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+          {
+            lv_label_set_text(ui_settingsscreen_lblerrormessage, "Failed to save scripts");
+            lv_obj_clear_flag(ui_settingsscreen_settingserrormodal, LV_OBJ_FLAG_HIDDEN);
+
+            lv_label_set_text(ui_mainscreen_lblerrormessage, "Failed to save scripts");
+            lv_obj_clear_flag(ui_mainscreen_mainerrormodal, LV_OBJ_FLAG_HIDDEN);
+
+            xSemaphoreGive(xGuiSemaphore);
+          }
+        }
         break;
       }
       default:
@@ -387,6 +470,13 @@ void setButtonNameFromString(lv_obj_t *btnLabel, std::string name)
 
 void setButtonNames()
 {
+  ESP_LOGI("AstrosScript", "Setting button names: Page %d", script.GetPageCount());
+
+  for (int i = 1; i <= 9; i++)
+  {
+    ESP_LOGI("AstrosScript", "  Button %d: %s", i, script.GetScriptName(i).c_str());
+  }
+
   setButtonNameFromString(ui_mainscreen_lblscript1, script.GetScriptName(1));
   setButtonNameFromString(ui_mainscreen_lblscript2, script.GetScriptName(2));
   setButtonNameFromString(ui_mainscreen_lblscript3, script.GetScriptName(3));
@@ -561,19 +651,27 @@ void onWifiConnect(lv_event_t *e)
 void onApiKeyLostFocus(lv_event_t *e)
 {
   auto txt = lv_textarea_get_text(ui_settingsscreen_txtapikey);
+  httpClient.SetApiKey(txt);
   storageManager.saveApiKey(txt);
 }
 
 void onIpKeyLostFocus(lv_event_t *e)
 {
+  auto txt = lv_textarea_get_text(ui_settingsscreen_txtserverip);
+  httpClient.SetHost(txt);
+  storageManager.saveHost(txt);
 }
 
 void onUseGatewayChecked(lv_event_t *e)
 {
+  httpClient.SetUseHost(true);
+  storageManager.saveUseGateway(true);
 }
 
 void onUseGatewayUnchecked(lv_event_t *e)
 {
+  httpClient.SetUseHost(false);
+  storageManager.saveUseGateway(false);
 }
 
 void onSyncScripts(lv_event_t *e)
@@ -601,6 +699,10 @@ void onCbxSSIDChanged(lv_event_t *e)
   lv_dropdown_set_text(cbx, NULL);
 }
 
+void onSettingsClosed(lv_event_t *e)
+{
+}
+
 void onKbdPressed(lv_event_t *e)
 {
   auto *kbd = lv_event_get_target(e);
@@ -621,11 +723,6 @@ void onKbdPressed(lv_event_t *e)
     lv_obj_clear_state(ui_settingsscreen_txtpassword, LV_STATE_FOCUSED);
     lv_obj_add_flag(kbd, LV_OBJ_FLAG_HIDDEN);
   }
-}
-
-void onSettingsClosed(lv_event_t *e)
-{
-  
 }
 
 void onErrorAck(lv_event_t *e)
