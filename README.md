@@ -10,7 +10,7 @@ The UI is designed using Squareline Studio (https://squareline.io/). Open /.squa
 
 You will need to update your "Project Export Root" and "UI Files Export Path" in your Squareline Project Settings.
 
-
+![Squareline Studio Settings](https://github.com/battlesloth/AstrOs.Screen/blob/main/.readme_files/squareline.jpg)
 
 ## Elecrow ESP32 WZ8048C050 ESP-IDF
 This poject is currently set up to work on Elecrow 5" LCD display WZ8048C050. You may be able to get it working with other displays.
