@@ -9,7 +9,7 @@ This project is for a portable touch screen remote to trigger animations for [As
 - The "Panic Stop" Button tiggers all animations to hault immedaitely.
 - The round indicator to the left of the "Panic Stop" indicates WiFi connection status (green for connected, red for disconnected).
 - The gear button to the right of the "Panic Stop" opens the setting screen.
-- The 9 buttons in the grid corrispond to the AstrOs animation scripts configured in the AstrOs Server Screen Configuration page.
+- The 9 buttons in the grid correspond to the AstrOs animation scripts configured in the AstrOs Server Screen Configuration page.
 
 ## Settings Screen
 
