@@ -1,5 +1,5 @@
 # AstrOs Screen
-This project is for a portable touch screen remote to trigger animations for AstrOs (https://github.com/battlesloth/AstrOs.Server). It syncs with the configurations on the AstrOs Remote web page.
+This project is for a portable touch screen remote to trigger animations for [AstrOs](https://github.com/battlesloth/AstrOs.Server). It syncs with the configurations on the AstrOs Remote web page.
 
 ## Main Screen
 
