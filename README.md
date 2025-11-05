@@ -15,7 +15,7 @@ This project is for a portable touch screen remote to trigger animations for [As
 
 ![AstrOs Screen Settings](https://github.com/battlesloth/AstrOs.Screen/blob/main/.readme_files/AstrOsSettings.jpg)
 
-- Click on the WiFi Scan button. The SSID drop down will populate with available access points
+- Click on the WiFi Scan button. The SSID drop down will populate with available access points.
 - Password field is for the WiFi password.
 - If you are connecting directly to the AstrOs Server as a WiFi Access Point, leave "Server IP" blank and "Using WiFi Router" unchecked.
 - If you are using a WiFi router instead, check "Using WiFi Router" and enter the AstrOs Server's IP in the "Server IP" field.
