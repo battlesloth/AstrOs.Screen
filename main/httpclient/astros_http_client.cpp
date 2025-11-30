@@ -105,10 +105,12 @@ void AstrOsHttpClient::SendSyncRequest()
 
 void AstrOsHttpClient::SendScriptCommand(std::string scriptId)
 {
+    auto query = "id=" + scriptId;
+
     esp_http_client_config_t config = {
         .host = getDestination().c_str(),
         .path = "/api/remotecontrol",
-        .query = ("id=" + scriptId).c_str(),
+        .query = query.c_str(),
         .disable_auto_redirect = true,
         .event_handler = httpScriptHandler,
         .transport_type = HTTP_TRANSPORT_OVER_TCP,

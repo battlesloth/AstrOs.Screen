@@ -275,7 +275,7 @@ void wifiTask(void *arg)
       }
       case AstrOsWifiMessageType::SCRIPT_COMMAND:
       {
-        ESP_LOGI(TAG, "Sending script command");
+        ESP_LOGI(TAG, "Sending script command %s", msg.message);
         httpClient.SendScriptCommand(msg.message);
         break;
       }
